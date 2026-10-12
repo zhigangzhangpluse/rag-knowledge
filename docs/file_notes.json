@@ -1,0 +1,315 @@
+{
+  "app/__init__.py": {
+    "purpose": "把 app 目录声明为 Python 包，让其他文件可以用 app.xxx 导入。",
+    "knowledge": "包把相关模块组织在一起。这里没有启动服务的副作用，导入 app 不会下载模型。"
+  },
+  "app/config.py": {
+    "purpose": "读取 .env 和环境变量，定义所有可调参数，并在启动时检查不合法配置。",
+    "knowledge": "配置与代码分离后，更换模型、数据库或分块策略无需修改业务算法。SecretStr 默认遮盖密钥；只有创建模型客户端时才交给 SDK。环境变量优先于 .env。",
+    "functions": {
+      "validate_options": "启动前检查重叠窗口小于块长度，并拒绝未知运行模式，防止死循环或误用测试替身。"
+    }
+  },
+  "app/database.py": {
+    "purpose": "定义四张关系表，以及创建数据库连接和事务会话的方法。",
+    "knowledge": "ORM 把 Python 对象映射成数据库行。Mapped 是字段类型，mapped_column 定义列。主键唯一标识一行；外键表达表之间的关系；索引加速过滤。提交 commit 后数据才持久保存。",
+    "functions": {
+      "new_id": "生成随机 UUID 的 32 位十六进制文本，作为业务对象的 ID。",
+      "now": "生成带 UTC 时区的当前时间，避免服务器本地时区差异。",
+      "make_database": "准备数据目录，创建数据库引擎与表，返回每次事务可使用的 session 工厂。"
+    }
+  },
+  "app/parsing.py": {
+    "purpose": "读取 Markdown、Word、PDF，统一成 Block，再切成可检索 Chunk 的数据字典。",
+    "knowledge": "解析解决文件格式，清洗解决文本噪声，分块解决检索粒度。它们是三个独立问题。本实现按字符计数；标题参与内容哈希和向量化，位置信息用于引用。",
+    "functions": {
+      "clean": "去掉空字符、压缩横向空白和连续空行，同时保留正文换行。",
+      "parse_markdown": "读取 Markdown 语法 token，用标题层级栈保留当前章节，提取正文、代码和表格及行号。",
+      "parse_docx": "按 Word 中的实际内容顺序遍历段落和表格，依据 Heading 样式更新标题路径。",
+      "parse_pdf": "逐页提取文字、过滤重复页眉页脚，识别简单编号标题并保留页码；扫描件明确报错。",
+      "parse": "按扩展名选择解析器。返回值统一为 Block 列表，后续不用知道原文件类型。",
+      "split_blocks": "清洗后按章节和位置组织文本，用有限长度及重叠窗口切分，尽量在句子边界断开，并计算内容哈希。",
+      "pdf_heading_level": "识别短文本中的章、节和数字编号标题，返回标题层级；这是一种保守启发式，不等于理解所有 PDF 排版。"
+    }
+  },
+  "app/models.py": {
+    "purpose": "统一 Embedding 和 Reranker 的调用接口，隔离真实 BGE 与演示替身。",
+    "knowledge": "cached_property 表示第一次调用才创建模型，后续复用，避免每次请求重新加载权重。BGE 编码器把一条文本转成向量；CrossEncoder 同时读问题和文本并评分。演示模型只有字符匹配能力。",
+    "functions": {
+      "__init__": "保存配置，延迟真正加载大型模型。",
+      "embedder": "创建 SentenceTransformer 编码器，指定模型、运行设备和缓存目录。",
+      "reranker": "创建 CrossEncoder 重排序器，限制输入长度以控制计算成本。",
+      "encode": "把输入文本批量转成归一化向量；演示实现使用固定维度的哈希字符向量。",
+      "scores": "为每一对问题与文档计算相关性；真实模型使用 Sigmoid 分数，演示实现使用字符覆盖率。"
+    }
+  },
+  "app/index.py": {
+    "purpose": "封装 Milvus 的建索引、写入、搜索和删除，另提供只用于演示的本地向量比较。",
+    "knowledge": "索引可以根据原始文档重新构建。Milvus 搜索先限制知识库、模型和有效版本，再做向量排序；返回结果还会核验 SQL 分块。upsert 是存在则更新、不存在则新增。",
+    "functions": {
+      "__init__": "保存连接配置和 collection 名称。",
+      "client": "第一次访问时建立 Milvus 客户端，连接超时设为 20 秒。",
+      "ensure": "没有 collection 时创建；已存在时检查向量维度，避免混入另一种空间。",
+      "upsert": "分批写入向量及过滤字段，避免一次发送过大请求；演示实现不需要额外索引。",
+      "search": "仅从有效版本候选中检索；真实实现调用 Milvus，演示实现使用向量点积排序。",
+      "delete_document": "删除一个文档的所有向量记录。",
+      "delete_old_versions": "只删除比新有效版本更早的向量。",
+      "health": "发送轻量请求确认索引服务能够访问。"
+    }
+  },
+  "app/retrieval.py": {
+    "purpose": "实现从业务有效分块到向量/BM25/RRF/重排序/去重的完整检索链。",
+    "knowledge": "不要把两种不同量纲的检索分数直接相加。RRF 使用名次融合。BM25 每次只看本知识库当前有效分块，避免删除和更新后关键词结果滞后。性能优化应保留这些过滤约束。",
+    "functions": {
+      "active_chunks": "把 Chunk 和 Document 关联，筛选知识库匹配、未删除、有效版本以及同一模型的分块。",
+      "tokens": "中文分词并小写化，去掉只有空白或标点的词项。",
+      "rrf": "对每一路去重后的排名计算倒数排名分数，再按累计分数从高到低排序。",
+      "__init__": "保存需要协作的数据库、模型、向量索引和配置。",
+      "retrieve": "执行可切换的检索策略，生成候选、重排、过滤低分与重复内容，最后返回上下文预算内的 Hit。"
+    }
+  },
+  "app/sessions.py": {
+    "purpose": "管理知识库内的对话历史，支持 Redis 生产实现和内存演示实现。",
+    "knowledge": "Redis key 同时包含 kb_id 与 session_id，防止不同知识库的同名会话串历史。pipeline 事务把追加、截断和过期放在一起。会话保留最近 12 条消息，即 6 轮完整问答。",
+    "functions": {
+      "__init__": "建立 Redis 客户端或初始化内存字典和锁，保存会话有效期。",
+      "key": "构造带命名空间的会话键。",
+      "get": "读取尚未过期的最近历史并转成 Python 消息对象。",
+      "append": "将一轮用户问题和完整答案同时追加，再限制历史长度并刷新过期时间。",
+      "clear": "删除指定知识库的一条会话。",
+      "health": "检查 Redis 连接；内存演示实现无需网络。"
+    }
+  },
+  "app/ingestion.py": {
+    "purpose": "管理上传与文档版本、持久化任务、后台处理、失败重试、删除同步。",
+    "knowledge": "RLock 保护同一进程内的关键修改；FileLock 保证同数据目录只有一个 Worker。新版本先准备完成才切换 active_version。删除先标记业务不可见再清理索引。多个数据库之间没有自动分布式事务，正确顺序十分关键。",
+    "functions": {
+      "__init__": "保存依赖，创建线程锁、退出事件和进程文件锁。",
+      "submit": "检查知识库和文件，计算文件哈希，跳过未改变内容，创建新版本原文和待处理任务。",
+      "delete_document": "立即把文档标记为 deleted，取消未完成入库，并排队清理索引与原文。",
+      "retry": "只允许失败且未过时的任务重新进入队列，拒绝同时执行同文档多个任务。",
+      "stage": "记录任务阶段，让页面知道当前正在做什么；已取消的任务不继续处理。",
+      "process_one": "领取一条排队任务，执行对应动作，持久化成功或失败状态，不把异常细节和凭据暴露给页面。",
+      "ingest": "解析、切块、复用向量、写新版本分块与索引，再切换版本并清理旧索引。",
+      "remove": "删除向量、核验待清理文件处于数据目录内、清理原文与分块。",
+      "start": "取得进程锁，把上次中断的 running 任务恢复为 queued，再启动后台线程。",
+      "run": "顺序处理队列；空队列时等待退出事件或下一次检查。",
+      "close": "通知线程停止，等待当前任务短暂收尾，安全时释放进程锁。"
+    }
+  },
+  "app/generation.py": {
+    "purpose": "调用 DeepSeek、组织 LangChain 提示词链、改写追问、流式生成、核验引用并保存会话。",
+    "knowledge": "LangChain 的竖线运算符把提示模板、模型和文本解析器串成流水线。invoke 一次取完整结果，stream 逐段取结果。文档内容是证据数据，不能覆盖系统规则。引用编号存在性检查不能代替语义真实性审核。",
+    "functions": {
+      "__init__": "保存配置或问答流程所需的数据库、检索器、会话和模型。",
+      "model": "按配置构造兼容 DeepSeek 的 ChatOpenAI 客户端，设置超时、重试和输出长度，不主动发送请求。",
+      "rewrite": "无历史则使用原问题；有历史则请求模型仅补全指代和省略。演示实现只做简单拼接。",
+      "stream": "在模型类中逐段生成文本；在 ChatService 中编排整轮 SSE：读取历史、改写、检索、引用、输出与保存。",
+      "event": "把事件名与 JSON 内容序列化成 SSE 协议，末尾空行标记事件结束。",
+      "sources": "重新核验分块仍属于文档有效版本，并给可展示的证据连续编号。"
+    }
+  },
+  "app/main.py": {
+    "purpose": "组装各模块并暴露 HTTP 接口，同时提供静态操作页面。",
+    "knowledge": "FastAPI 装饰器把 URL 和处理函数绑定。Pydantic 限制输入长度和会话 ID 格式。FileResponse 返回文件，StreamingResponse 返回迭代器产生的数据。默认本机使用；知识库 ID 不是登录凭证。",
+    "functions": {
+      "create_app": "按运行模式装配真实服务或演示替身，创建所有路由，返回可供 Uvicorn 运行的 ASGI 应用。",
+      "lifespan": "启动时创建后台任务线程，关闭时通知退出。",
+      "local_origin": "检查浏览器 Origin，阻止其他网站跨站调用本机服务。",
+      "missing_handler": "把业务对象不存在转换成 HTTP 404。",
+      "invalid_handler": "把无效业务操作转换成 HTTP 400。",
+      "require_kb": "确认知识库存在。",
+      "require_job": "确认任务通过文档归属于指定知识库。",
+      "health": "检查存储服务连接并返回非敏感模式信息，不消费大模型额度。",
+      "list_kbs": "返回已有知识库的 ID 和名称。",
+      "create_kb": "校验名称后新增一条知识库记录。",
+      "list_documents": "列出指定知识库未删除的文档和有效版本。",
+      "read_upload": "限制读取大小，关闭上传文件对象，拒绝空文件或超大文件。",
+      "upload": "接收新文档并排队入库，返回 202 表示已接收而非处理完成。",
+      "update_document": "为已有文档创建新的入库版本。",
+      "delete_document": "执行逻辑删除并创建清理任务。",
+      "list_jobs": "返回最近 30 个任务的状态和错误摘要。",
+      "retry_job": "确认任务归属后请求失败重试。",
+      "get_chunk": "只允许读取当前有效且未删除的原文片段。",
+      "download": "找到文档有效版本对应的原始文件并以附件返回。",
+      "ask": "校验问题，返回 ChatService 的 SSE 流。",
+      "clear_session": "清除指定知识库中的会话历史。",
+      "home": "把 web/index.html 作为首页发送给浏览器。",
+      "learning_guide": "返回生成好的中文 HTML 学习手册，仅开放这一份明确的文档。"
+    }
+  },
+  "web/index.html": {
+    "purpose": "定义页面的语义结构和控件：知识库选择、文件上传、任务区、聊天区与提示区。",
+    "knowledge": "HTML 定义内容结构；CSS 定义外观；JavaScript 定义交互。id 是脚本查找控件的唯一名字。label、aria-label、aria-live 帮助键盘和读屏用户。页面不含 API 密钥。"
+  },
+  "web/style.css": {
+    "purpose": "设置网页颜色、字号、间距、布局、按钮状态和移动端适配。",
+    "knowledge": "选择器决定样式作用于谁。Grid 负责两栏主布局，Flex 负责局部排列。box-sizing:border-box 让宽度包含内边距。媒体查询在窄屏时切换单列。"
+  },
+  "web/app.js": {
+    "purpose": "连接网页控件和后端接口，管理上传、任务刷新、会话切换与 SSE 文本追加。",
+    "knowledge": "fetch 发 HTTP 请求；Promise/await 处理异步结果。FormData 发送文件。textContent 把内容当文字展示，避免把文档里的 HTML 当可执行页面。AbortController 用于切换会话时取消旧请求。"
+  },
+  "scripts/setup.ps1": {
+    "purpose": "检查 Python 版本，建立项目虚拟环境，按锁定版本安装依赖，并在缺失时复制配置模板。",
+    "knowledge": "PowerShell 的 $ 开头名称是变量；& 调用可执行文件。每个外部命令后检查 LASTEXITCODE，避免前一步失败后仍打印安装成功。"
+  },
+  "scripts/start.ps1": {
+    "purpose": "从项目根目录启动本机服务，可选择演示模式和端口。",
+    "knowledge": "-Demo 使用独立的 demo.db，不会混用真实向量。--factory 表示让 Uvicorn 调用 create_app。--workers 1 对应当前单 Worker 设计。"
+  },
+  "scripts/check.ps1": {
+    "purpose": "依次运行自动测试、Python 编译检查和 JavaScript 语法检查。",
+    "knowledge": "测试验证行为，语法检查只验证代码可解析，两者不能互相替代。PYTEST_DISABLE_PLUGIN_AUTOLOAD 减少外部 pytest 插件对项目测试的干扰。"
+  },
+  "scripts/probe_services.py": {
+    "purpose": "按命令行开关独立检查真实 Milvus、Redis、DeepSeek 和 BGE，把非敏感状态保存到报告。",
+    "knowledge": "--llm 会消耗少量真实额度；--models 会下载大型模型。探针成功只能证明被检查的组件，不代表整条问答链已通过。",
+    "functions": {
+      "main": "解析检查选项，逐项调用真实依赖，捕获错误类型，保存报告并用退出码表达是否有失败。"
+    }
+  },
+  "scripts/evaluate.py": {
+    "purpose": "对相同测试题比较三种检索策略，生成待人工审阅的回答与引用报告，并汇总人工标注。",
+    "knowledge": "Recall@K 在此按预先标注证据的覆盖率计算。回答正确性和引用语义支持须人工审核，缺少审核时保留 null。延迟包含问题改写和可选生成，不等于只测检索模型速度。",
+    "functions": {
+      "percentile": "排序后选择接近指定分位的观测值，小样本只提供近似统计。",
+      "summarize": "对召回率、人工正确性和引用支持率做平均，同时计算 P50/P95。",
+      "main": "读取评测参数，检查证据存在，运行三种策略或汇总已有人工评分，最后写出 JSON。"
+    }
+  },
+  "scripts/build_guide.py": {
+    "purpose": "从真实源文件生成带行号的中文手册，结合人工编写的模块说明和语法树解释，不读取真实密钥。",
+    "knowledge": "AST 是代码的结构化表示，可以区分赋值、循环、条件和函数调用。生成器用 HTML 转义防止示例代码变成可执行标签。代码改变后应重新生成并检查手册。"
+  },
+  "tests/__init__.py": {
+    "purpose": "把测试目录标记成可导入的包，方便共用上传辅助函数。",
+    "knowledge": "测试代码也是项目的一部分，但只有运行 pytest 才会执行其中的测试函数。"
+  },
+  "tests/conftest.py": {
+    "purpose": "为每个测试提供临时数据库、测试客户端和知识库，并封装准备可检索文档的步骤。",
+    "knowledge": "pytest fixture 是可复用的测试准备过程。tmp_path 隔离测试数据。monkeypatch 在单个测试中临时替换依赖，不会永久修改生产代码。",
+    "functions": {
+      "client": "创建不启动后台线程的测试应用，方便测试显式推进一条任务。",
+      "kb": "在测试应用中创建一个知识库并返回 ID。",
+      "upload_ready": "通过真实上传接口提交样本文档，手动处理任务并确认完成。"
+    }
+  },
+  "tests/test_documents.py": {
+    "purpose": "验证文档生命周期：入库、隔离、幂等更新、替换失败、重试、删除与敏感文件隔离。",
+    "knowledge": "测试故意让向量写入失败，检验旧版本仍可用。正确的测试不仅检查 happy path，也检查失败时系统状态是否符合约束。"
+  },
+  "tests/test_chat.py": {
+    "purpose": "验证 SSE 的事件协议、空库拒答、来源编号、会话隔离和生成失败处理。",
+    "knowledge": "测试模型替身验证流程和协议，不验证 BGE 或 DeepSeek 的真实效果。完整 SSE 应以 done 或 error 结束。"
+  },
+  "tests/test_parsing.py": {
+    "purpose": "构造小型 Markdown、Word、PDF 检查解析结果，验证重叠窗口没有丢字以及 RRF 融合规律。",
+    "knowledge": "输入越小越清楚，测试失败时越容易知道哪个规则出了问题。扫描 PDF 的预期是明确报错，而不是假装解析成功。"
+  },
+  "compose.yaml": {
+    "purpose": "默认本机部署：真实 Milvus 单机服务和 Redis，端口仅绑定本机。",
+    "knowledge": "Milvus 使用官方内嵌 etcd 与本地存储模式，避免依赖无法下载的 MinIO 镜像。RAG_VOLUME_DIR 指向 D 盘持久目录。适合本机学习，不是高可用集群。"
+  },
+  ".env.example": {
+    "purpose": "可公开分享的配置模板；真实密钥只填写在本地 .env。",
+    "knowledge": "每行 KEY=VALUE。环境变量和 Settings 把配置从代码分离。修改配置后需重启应用。不要在截图、日志或文档中展示真实 API Key。"
+  },
+  ".gitignore": {
+    "purpose": "声明 Git 不应追踪的本机配置、缓存、上传数据与模型目录。",
+    "knowledge": "gitignore 只影响尚未被追踪的文件；如果秘密已提交，它不会自动删除历史。本目录当前不一定已初始化 Git。"
+  },
+  "requirements.txt": {
+    "purpose": "声明项目直接依赖及允许的版本范围。",
+    "knowledge": "范围便于后续升级；实际可复现安装优先使用 requirements.lock.txt。升级依赖后必须跑测试。"
+  },
+  "requirements.lock.txt": {
+    "purpose": "记录本机验证环境里每个依赖的精确版本，便于重新安装同一环境。",
+    "knowledge": "包含直接和传递依赖；例如你安装 LangChain，它又依赖 Pydantic 等工具。锁文件不是源码，不要逐包手动编辑。"
+  },
+  "pytest.ini": {
+    "purpose": "配置 pytest 的测试目录和默认简洁输出。",
+    "knowledge": "testpaths 防止测试工具遍历模型缓存和虚拟环境等无关目录。"
+  },
+  "eval/dataset.jsonl": {
+    "purpose": "保存逐行 JSON 格式的业务评测题，含问题、参考答案、证据和是否可回答。",
+    "knowledge": "一行就是一个独立 JSON 对象，便于逐条处理和扩充。历史追问题额外提供 history；不是把参考答案喂给模型。"
+  },
+  "samples/员工手册.md": {
+    "purpose": "供上传、演示与评测使用的虚构公司制度资料。",
+    "knowledge": "这是示例业务数据，不是代码；评测题中的证据引用此文件。修改资料后应同步检查测试答案是否仍成立。"
+  },
+  "README.md": {
+    "purpose": "项目入口说明：安装、启动、评测、边界与官方参考。",
+    "knowledge": "第一次使用先读启动步骤，深入理解再读本手册。README 与详细教学文档服务于不同阅读场景。"
+  },
+  "docs/chapters.html": {
+    "purpose": "本手册前半部分的人工编写教学内容，包含入门知识、流程和维护练习。",
+    "knowledge": "这是 HTML 内容模板，修改后运行 build_guide.py 才会更新最终手册。"
+  },
+  "docs/file_notes.json": {
+    "purpose": "为每个文件保存人工编写的用途、知识点和函数说明，供手册生成器使用。",
+    "knowledge": "purpose 是用途，knowledge 是扩展知识，functions 按函数名提供业务含义。新建文件时应同步加入说明。"
+  },
+  "scripts/verify_model_pipeline.py": {
+    "functions": {
+      "main": "建立独立测试库，导入示例资料，依次提问并保存完整事件和答案供人工核验。"
+    },
+    "knowledge": "该脚本使用独立数据库、本地向量比较和内存会话。它验证模型协作，不验证 Milvus/Redis。运行会消耗少量 API 额度。",
+    "purpose": "用真实 BGE 和 DeepSeek 验证单轮问答、多轮追问与无答案拒答，测试资料是虚构员工手册。"
+  },
+  "reports/verification.md": {
+    "knowledge": "组件可调用、模拟集成通过、真实端到端通过，是三个不同层次的证据。",
+    "purpose": "记录当前已经获得的验证证据、未完成项和下一步，避免把演示模式当作真实服务验收。"
+  },
+  "tests/test_evaluation.py": {
+    "purpose": "检查评测汇总口径，保证未评审显示未知、人工判错计入失败。",
+    "knowledge": "None 表示未知，False 表示已判断为错误；统计时不能用简单的真假判断混淆两者。"
+  },
+  "scripts/install-runtime.ps1": {
+    "purpose": "在管理员权限下安装 WSL 和 Docker，将 Docker 程序、虚拟磁盘及安装临时文件指向 D:/RAGRuntime，不自动重启。",
+    "knowledge": "仅在明确需要安装时运行；先验证官方安装包签名，再安装。WSL 使用 --no-distribution 避免额外安装 Ubuntu。Docker 的许可协议留待首次启动处理。日志与阶段状态保存在 D 盘。"
+  },
+  "scripts/start-infra.ps1": {
+    "knowledge": "这是日常启动基础服务的命令，不会重新安装 Docker；.env 的 RAG_VOLUME_DIR 决定数据盘。--wait 会检查各容器健康状态，失败时脚本明确停止。",
+    "purpose": "在 Docker 引擎就绪后启动项目的 Milvus 和 Redis 容器，检查配置并等待服务健康。"
+  },
+  "scripts/verify_real_stack.py": {
+    "purpose": "真实服务验收：验证 FastAPI、BGE、Milvus、Redis、DeepSeek 的业务链路。",
+    "knowledge": "使用独立 UUID 集合与数据库隔离验收数据，直接查询 Milvus 检查旧版本和删除同步；Redis 使用新客户端读取历史，避免把内存会话误当持久化成功。真实 API 调用会消耗额度。",
+    "functions": {
+      "main": "准备隔离环境，验证入库、多轮、引用、拒答、更新、删除并输出报告。",
+      "passed": "记录已通过检查并即时输出进度。"
+    }
+  },
+  "compose.distributed.yaml": {
+    "purpose": "保留原外置 etcd、MinIO、Milvus、Redis 四容器配置作为架构参考。",
+    "knowledge": "该文件不是默认启动配置；当前固定 MinIO 镜像拉取失败，不能当作已验证可运行方案。不要与默认 compose 同时启动。"
+  },
+  "deploy/embedEtcd.yaml": {
+    "purpose": "配置 Milvus 内嵌的 etcd 元数据服务。",
+    "knowledge": "etcd 保存 Milvus 元数据；容器内部 2379 不映射到宿主机。按修订号压缩历史记录，数据由 Milvus 持久目录保存。"
+  },
+  "scripts/verify_browser.py": {
+    "purpose": "通过独立无界面 Edge 检查真实问答页面和学习手册，并保存截图与验收结果。",
+    "knowledge": "Playwright 操作独立浏览器实例，不读取日常浏览器资料。expect 等待网页达到预期状态；截图供人工观察排版。运行前需启动服务并准备示例知识库，额外依赖见 requirements-browser.txt。",
+    "functions": {
+      "main": "选择示例库、提交真实问题、展开引用，再验证手册导航与搜索，保存验证报告。"
+    }
+  },
+  "requirements-browser.txt": {
+    "purpose": "浏览器验收可选依赖，日常运行问答项目不需要安装。",
+    "knowledge": "固定 Playwright 版本，复用已安装的 Edge，不额外下载浏览器。pip install -r requirements-browser.txt 可安装。"
+  },
+  "scripts/export_guide_markdown.py": {
+    "purpose": "将系统教学章节、各文件职责、完整源码和逐行解析导出为 Markdown，便于离线阅读与记笔记。",
+    "knowledge": "HTMLParser 是 Python 标准库的 HTML 解析器；先构建节点树，再把标题、列表、表格转换成 Markdown。源码使用代码围栏完整保存，解释单独按行号列出，避免源码中的竖线破坏表格。Markdown 覆盖清单记录源文件哈希，用来发现过期文档。",
+    "functions": {
+      "main": "读取教学章节与文件说明，逐个导出当前源代码和解释，写入 Markdown 手册及覆盖清单。",
+      "render": "把 HTML 节点递归转换成 Markdown，保留标题、列表、代码和表格。",
+      "cell": "处理表格中的竖线和换行，防止单元格错位。",
+      "text": "递归收集节点中纯文本。",
+      "collect": "收集 HTML 表格行和单元格。"
+    }
+  }
+}

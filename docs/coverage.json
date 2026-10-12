@@ -1,0 +1,284 @@
+[
+  {
+    "file": "app/__init__.py",
+    "lines": 1,
+    "explained_lines": 1,
+    "sha256": "c756881fed785d29efe492e05366be1be5c1e6897b42733f3bedc3f776eb8554"
+  },
+  {
+    "file": "app/config.py",
+    "lines": 40,
+    "explained_lines": 40,
+    "sha256": "4e5eb902d3e04f8bcce3556de8eece252ef67c8f440e957c02a40cc3e97f0f63"
+  },
+  {
+    "file": "app/database.py",
+    "lines": 73,
+    "explained_lines": 73,
+    "sha256": "e2d7094832b60f63d5a698c64a8b0800a9faf9db57ed610b0d4ea7aacb15b76b"
+  },
+  {
+    "file": "app/parsing.py",
+    "lines": 161,
+    "explained_lines": 161,
+    "sha256": "d22e09a7dc6252239e40c05a52bedc66b317713fb8a5d6f11a97e7dd32b6264f"
+  },
+  {
+    "file": "app/models.py",
+    "lines": 52,
+    "explained_lines": 52,
+    "sha256": "08897c6e00a486526c4fc01f0329a2512cd94f820c58d1b5b21a4a5de1fbfa5d"
+  },
+  {
+    "file": "app/index.py",
+    "lines": 77,
+    "explained_lines": 77,
+    "sha256": "234d9f292c8c4b59185b47ddc811428e0d31723d7949cb938ed23a79161ee8e7"
+  },
+  {
+    "file": "app/retrieval.py",
+    "lines": 74,
+    "explained_lines": 74,
+    "sha256": "5c488c5bf9d1aae74c03249db3be7ba780a6e4c27b7a08a9be1d40b86b63edba"
+  },
+  {
+    "file": "app/sessions.py",
+    "lines": 57,
+    "explained_lines": 57,
+    "sha256": "bbad24420701d30bc4c2e0e45c9ea864fc85e923c452154d4933589cc83d9d0a"
+  },
+  {
+    "file": "app/ingestion.py",
+    "lines": 198,
+    "explained_lines": 198,
+    "sha256": "df4aaed46632c0214d5eab8ece91ca372c59e9cad327945b8f0a701595725513"
+  },
+  {
+    "file": "app/generation.py",
+    "lines": 125,
+    "explained_lines": 125,
+    "sha256": "a84ad6497a9a7cf9089878bcf7583dc841932426d2e51a78f57b99bda6ff3890"
+  },
+  {
+    "file": "app/main.py",
+    "lines": 201,
+    "explained_lines": 201,
+    "sha256": "18343a2149f8528f1ee0e78a657f64658c94e82c0f061ef78e4802ba22c14ce8"
+  },
+  {
+    "file": "web/index.html",
+    "lines": 39,
+    "explained_lines": 39,
+    "sha256": "41ef715b0cbf44c7995fa144bef15e1dedd15e92f949a84f14c76ab6c96f218d"
+  },
+  {
+    "file": "web/style.css",
+    "lines": 51,
+    "explained_lines": 51,
+    "sha256": "241e29912437b097020716e0eb81dded92f02d0dc3eaaeb453ede3814204036d"
+  },
+  {
+    "file": "web/app.js",
+    "lines": 198,
+    "explained_lines": 198,
+    "sha256": "4ebf25d42dc596cacce1fa7c28e41341e606f1b14145de756351520f2d7bd3b9"
+  },
+  {
+    "file": "scripts/setup.ps1",
+    "lines": 16,
+    "explained_lines": 16,
+    "sha256": "7ecab443c4475a64690bb90e135a4a870427f3a7f07ae51b6dd3e36acf9faba2"
+  },
+  {
+    "file": "scripts/start.ps1",
+    "lines": 19,
+    "explained_lines": 19,
+    "sha256": "9aedaf212e733d1904bd0a69cd0cd5679cfd4e48fae80feba7b38681ce3b9ee8"
+  },
+  {
+    "file": "scripts/check.ps1",
+    "lines": 12,
+    "explained_lines": 12,
+    "sha256": "71809a151eae95eae776b3f2281a1e00627fe9bfbcc299bd9ca253bf0005743d"
+  },
+  {
+    "file": "scripts/probe_services.py",
+    "lines": 51,
+    "explained_lines": 51,
+    "sha256": "0d3c36524424c2596131a4676392278faa4e4c0dceaffd4fa2f7940a46fd4470"
+  },
+  {
+    "file": "scripts/evaluate.py",
+    "lines": 84,
+    "explained_lines": 84,
+    "sha256": "88ded2e53ab32251f5d56a83016e091c85cfcd7d0366c636b6a80a101c7b56c1"
+  },
+  {
+    "file": "scripts/build_guide.py",
+    "lines": 419,
+    "explained_lines": 419,
+    "sha256": "0995d9bb5f8e2793ae90d58af08065e468e3894f00678f8dd58e5de765946b1c"
+  },
+  {
+    "file": "tests/__init__.py",
+    "lines": 1,
+    "explained_lines": 1,
+    "sha256": "9fe645500791e0698d9703d55116dbd0863064bcf81ba54d079f4b6bf53b05c0"
+  },
+  {
+    "file": "tests/conftest.py",
+    "lines": 30,
+    "explained_lines": 30,
+    "sha256": "9e24f99c3d91b308fabd475f6bfa7a95e35c32c1c8d9c2d9cd81064961585dfa"
+  },
+  {
+    "file": "tests/test_documents.py",
+    "lines": 134,
+    "explained_lines": 134,
+    "sha256": "3b7d663b486c1792396f226aca0efc4a30c1834d8243fc00b34f7d0a20efd82c"
+  },
+  {
+    "file": "tests/test_chat.py",
+    "lines": 66,
+    "explained_lines": 66,
+    "sha256": "cab50a29e8b54889feef8b2f08498601731ba1aa938f88e9e8af4af97c0fb50b"
+  },
+  {
+    "file": "tests/test_parsing.py",
+    "lines": 81,
+    "explained_lines": 81,
+    "sha256": "55e36460f3b9074068c61764519351d4d657bae1c6add318bba45696561c8700"
+  },
+  {
+    "file": "compose.yaml",
+    "lines": 36,
+    "explained_lines": 36,
+    "sha256": "88f81e56fe9e74d8a7b3f363bb1b64e814f9351656df9d8783771f038099648a"
+  },
+  {
+    "file": ".env.example",
+    "lines": 23,
+    "explained_lines": 23,
+    "sha256": "8893ebf48a6504d95a2a0b2fc7ed10b3769ce226f8e447e542895b390b970478"
+  },
+  {
+    "file": ".gitignore",
+    "lines": 16,
+    "explained_lines": 16,
+    "sha256": "24e7ffde8aec06663dbf39fba9704bf0e8877cdc82978281b31988de0b86ff66"
+  },
+  {
+    "file": "requirements.txt",
+    "lines": 19,
+    "explained_lines": 19,
+    "sha256": "67099323b79f88d8510d0d9cfc84e512f84946ea07028347f51597b0071ee681"
+  },
+  {
+    "file": "requirements.lock.txt",
+    "lines": 100,
+    "explained_lines": 100,
+    "sha256": "88a9484caff63ee048610fba0a91254d09c38cc836c6bc25485568400ce9cee6"
+  },
+  {
+    "file": "pytest.ini",
+    "lines": 3,
+    "explained_lines": 3,
+    "sha256": "efcce6f55356a0fdaf6f9631b9d9a9a92fd1caba8ddce5809b8a77bb998cc3ba"
+  },
+  {
+    "file": "eval/dataset.jsonl",
+    "lines": 15,
+    "explained_lines": 15,
+    "sha256": "c78b8f4e8cfe0019e3659b1609502faf60cc96380464aed90efbec3b057ea64b"
+  },
+  {
+    "file": "samples/员工手册.md",
+    "lines": 31,
+    "explained_lines": 31,
+    "sha256": "4c2b3e8365a8cae6dff5f4269bece3163ea19e03f4d30e4ecdc1fab625bfe8b1"
+  },
+  {
+    "file": "README.md",
+    "lines": 119,
+    "explained_lines": 119,
+    "sha256": "1f129c090d53202e86f7b288f472ec2c919942449a03ba56d14e30778b1c79ce"
+  },
+  {
+    "file": "docs/chapters.html",
+    "lines": 109,
+    "explained_lines": 109,
+    "sha256": "c1e4d5a302dbe43bdd9025bdcf1cac903ac847e7222919aecf45de6ebe04773f"
+  },
+  {
+    "file": "docs/file_notes.json",
+    "lines": 315,
+    "explained_lines": 315,
+    "sha256": "4942cfae6eb593eb6a70156354aa074ed87a649ddff40128e0d2913c3bda0809"
+  },
+  {
+    "file": "scripts/verify_model_pipeline.py",
+    "lines": 53,
+    "explained_lines": 53,
+    "sha256": "45aa02f06732e4d1829a47bfb478a89b8fee63e8dac844443f2685d6cdb11e2d"
+  },
+  {
+    "file": "reports/verification.md",
+    "lines": 38,
+    "explained_lines": 38,
+    "sha256": "fea87f3283c78a206fb2ab4022b69d64871dba91660691e9cfca170756532bc1"
+  },
+  {
+    "file": "tests/test_evaluation.py",
+    "lines": 21,
+    "explained_lines": 21,
+    "sha256": "aecd02f7afaa0d9679f10f2bffb7e40df9bc810e93528697dfc209ff948d95c7"
+  },
+  {
+    "file": "scripts/install-runtime.ps1",
+    "lines": 35,
+    "explained_lines": 35,
+    "sha256": "4600b831335961efab5a22829edf7d6eacb803989767772893367c388c8339a1"
+  },
+  {
+    "file": "scripts/start-infra.ps1",
+    "lines": 16,
+    "explained_lines": 16,
+    "sha256": "25a294b448b4228bfcbe99466aa98f998a8dfa95c33f9f642d673fc3f042cb2b"
+  },
+  {
+    "file": "scripts/verify_real_stack.py",
+    "lines": 86,
+    "explained_lines": 86,
+    "sha256": "747aca3a9bdd568483d0859122e37d117fe9f1249d929612e02cfbbe495933e9"
+  },
+  {
+    "file": "compose.distributed.yaml",
+    "lines": 67,
+    "explained_lines": 67,
+    "sha256": "4194fe7b28298f3e040362c9197a0f86c1fc67b4e7dcbe81ec1c80e1903d57f4"
+  },
+  {
+    "file": "deploy/embedEtcd.yaml",
+    "lines": 5,
+    "explained_lines": 5,
+    "sha256": "0efe4601853af24b84119d00693f2d0568ac574a47d58fd45d8a356efb964b9c"
+  },
+  {
+    "file": "scripts/verify_browser.py",
+    "lines": 42,
+    "explained_lines": 42,
+    "sha256": "cedb2a30e24cbd3ee540319c993b8e29c35dbdb2a9a757b5f52e51852e2fed7a"
+  },
+  {
+    "file": "requirements-browser.txt",
+    "lines": 1,
+    "explained_lines": 1,
+    "sha256": "a7bc75cbc21ab4e6b99e4dc78edcbd312e5f8097ed7136131d3272cb45377cc2"
+  },
+  {
+    "file": "scripts/export_guide_markdown.py",
+    "lines": 124,
+    "explained_lines": 124,
+    "sha256": "8f9b40fab40982701456bf0653ea0185652c74b1b5f1fd40703220debac772cd"
+  }
+]

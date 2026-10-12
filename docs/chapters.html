@@ -1,0 +1,109 @@
+<section id="welcome">
+<p class="eyebrow">从零读懂一个真实项目</p><h1>知源 · RAG 学习与维护手册</h1>
+<p class="lead">你不需要一次看懂所有代码。先知道系统在做什么，再跟着一个问题走一遍，最后回到具体文件。</p>
+<div class="callout">这份手册对应当前项目源代码。后面的“逐行阅读”包含每个代码文件的行号、原代码和解释。密钥不会被复制到文档中。</div>
+<h2>第一次，只做这三件事</h2>
+<ol><li>阅读本章的两个流程，知道“上传”和“提问”是两回事。</li><li>按 README 启动演示页面，上传 samples/员工手册.md，问“年假几天”。</li><li>打开回答下面的引用，对照原文。你看到的片段，就是系统交给大模型的依据。</li></ol>
+<p>演示模式不需要 Milvus、Redis 或真实模型。它用简单算法跑通页面和管理流程；真实模式才使用 BGE、Milvus、Redis 和 DeepSeek。不要用演示结果判断模型好坏。</p>
+</section>
+<section id="daily-operation"><h2>每天怎么用：按顺序操作</h2>
+<p>这台电脑已经装好依赖，不需要每天安装数据库或重新下载模型。先启动数据库，再启动网页后端，最后打开浏览器。</p>
+<ol><li>打开 <code>D:\RAGRuntime\Docker\Docker Desktop.exe</code>，等待引擎运行。</li><li>在项目文件夹的空白处打开 PowerShell，运行 <code>powershell -ExecutionPolicy Bypass -File scripts/start-infra.ps1</code>。最后看到 Milvus 和 Redis 都显示 healthy，表示数据库可用。</li><li>运行 <code>powershell -ExecutionPolicy Bypass -File scripts/start.ps1</code>。看到 <code>Uvicorn running on http://127.0.0.1:8000</code> 后，保留这个窗口。</li><li>浏览器访问 <a href="http://127.0.0.1:8000">http://127.0.0.1:8000</a>。选择“员工手册 · 真实服务示例”，问“正式员工每年有几天年假？”，展开引用核对原文。</li></ol>
+<p><code>-File</code> 后面是要执行的脚本路径；命令必须在项目根目录运行。如果提示端口被占用，先查看是否已经有项目窗口在运行，不要重复启动。首次问答要加载本地模型，可能比后续请求慢。</p>
+<h3>用完怎么停止</h3><p>在运行网页后端的 PowerShell 窗口按 <code>Ctrl+C</code>，等待服务退出。另开项目目录的 PowerShell，执行 <code>&amp; 'D:/RAGRuntime/Docker/resources/bin/docker.exe' compose stop</code> 停止数据库。stop 不删除数据。下次仍按上面的步骤启动。</p>
+<h3>三个存储各管什么</h3><table><tr><th>存储</th><th>你可以这样理解</th><th>本机位置</th></tr><tr><td>SQLite</td><td>登记簿：哪些知识库、文件、版本和任务存在。</td><td>项目 data/app.db，上传原文也在 data 目录内</td></tr><tr><td>Milvus</td><td>语义索引：根据问题向量找到相关文档块。</td><td>D:/RAGRuntime/volumes/milvus</td></tr><tr><td>Redis</td><td>对话记事本：保存近期聊天，默认一天过期。</td><td>D:/RAGRuntime/volumes/redis</td></tr></table>
+<p>Milvus 中的内嵌 etcd 是它自己的元数据管理组件，不代替项目的 SQLite。默认部署已不依赖 MinIO；compose.distributed.yaml 是原四容器参考配置，不能照它另起一套同名服务。</p>
+<h3>备份与恢复</h3><ol><li>先停止网页后端和容器，避免复制到一半仍有数据变化。</li><li>将整个项目 <code>data</code> 目录、<code>D:/RAGRuntime/volumes</code>、<code>.env</code> 及当前源码和依赖锁定文件复制到你选定的备份目录。模型缓存可另存，也可重新下载。</li><li>恢复前同样停止服务，将同一批次的数据恢复到对应位置，再按启动步骤运行。不要把不同时间的 SQLite 和 Milvus 备份混用。</li></ol><p>.env 中有密钥，备份应由你自己保管。容器镜像可重新下载，但上传原文和数据库记录应备份。不要使用带 <code>-v</code> 的清理命令或直接删除 volumes 来“修复”问题。</p>
+<h3>出现问题先看哪里</h3><table><tr><th>现象</th><th>第一步</th></tr><tr><td>网页打不开</td><td>看后端窗口是否还运行，地址是否为 127.0.0.1:8000。</td></tr><tr><td>上传一直等待或失败</td><td>看页面任务状态，再运行 start-infra.ps1 检查数据库；扫描 PDF 需先 OCR，旧 .doc 需转换为 .docx。</td></tr><tr><td>能打开页面但问答失败</td><td>查看后端窗口和 /api/health；健康接口只检查数据库，不证明 DeepSeek API 有效。模型 API 可用 scripts/probe_services.py --llm 单独验证，会消耗少量额度。</td></tr><tr><td>修改 .env 后没生效</td><td>停止并重新启动后端；已经加载的 Settings 不会自动重读文件。</td></tr><tr><td>答案不对</td><td>先看引用是否找对；没找对检查分块和召回，找对却答错再检查生成提示词和证据是否足够。</td></tr></table></section>
+<section id="mental-model">
+<h2>1. 先把 RAG 想成“开卷回答”</h2>
+<p>普通大模型像一个凭记忆回答的同学。RAG 会先从你提供的资料里找出相关段落，再让模型看着段落回答。RAG 的全称是 Retrieval Augmented Generation，中文是“检索增强生成”。</p>
+<p><strong>检索</strong>解决“看哪几段”；<strong>生成</strong>解决“如何组织语言”；<strong>引用</strong>解决“你凭什么这样说”。检索找错资料，模型即使表达流畅，答案也可能错误。</p>
+<div class="flow"><span>原始文档</span><b>→</b><span>解析与清洗</span><b>→</b><span>分块</span><b>→</b><span>BGE 向量化</span><b>→</b><span>索引入库</span></div>
+<p>上面是准备资料的流程。上传一次、处理一次；不会每次提问都重新解析所有文件。</p>
+<div class="flow"><span>用户问题</span><b>→</b><span>补全追问</span><b>→</b><span>找候选片段</span><b>→</b><span>重排序</span><b>→</b><span>模型作答与引用</span></div>
+<p>下面是每次提问都会执行的流程。首次加载模型和之后的请求耗时不同，评测时要区分冷启动与稳定运行。</p>
+<h3>用一句问题走一遍</h3><ol><li>你输入“年假几天”。网页向 FastAPI 发送一个 HTTP POST 请求。</li><li>服务检查知识库是否存在，读取会话历史。如果是第一轮，就直接使用原问题。</li><li>BGE 将问题变成数字向量。Milvus 查找意思接近的文档块。</li><li>BM25 同时寻找出现“年假”等词语的文档块。</li><li>RRF 综合两路排名；Reranker 再看“问题 + 文档”是否真正相关。</li><li>后端为证据编号，DeepSeek 根据证据输出“正式员工每年有 5 天年假。[1]”。</li><li>页面逐步显示文字，并把 [1] 对应的原文展示出来。</li></ol>
+</section>
+<section id="basics"><h2>2. 看代码之前，先认识这些词</h2>
+<table><thead><tr><th>名词</th><th>你可以这样理解</th><th>本项目中的例子</th></tr></thead><tbody>
+<tr><td>变量</td><td>给一份数据起名字，以后用名字找到它。</td><td>question 保存用户问题。</td></tr>
+<tr><td>函数</td><td>把重复步骤封装成一个有名字的工具。括号中放输入，return 返回结果。</td><td>clean(text) 输入原文本，返回清洗后的文本。</td></tr>
+<tr><td>类 / 对象</td><td>类是设计图，对象是按图建造的一份实例。</td><td>Settings 是配置设计图，settings 是本次运行的实际配置。</td></tr>
+<tr><td>self</td><td>类方法里指向“当前这个对象”。</td><td>self.settings 是当前服务保存的配置。</td></tr>
+<tr><td>列表 / 字典</td><td>列表像按顺序排好的盒子；字典通过名称取值。</td><td>sources 是来源列表；source['text'] 取某条来源的正文。</td></tr>
+<tr><td>导入 import</td><td>把其他文件或第三方库的工具带进当前文件。</td><td>from app.parsing import parse。</td></tr>
+<tr><td>依赖</td><td>项目借用的外部工具包。</td><td>FastAPI、pypdf、sentence-transformers。</td></tr>
+<tr><td>虚拟环境</td><td>这个项目自己的工具箱，避免和系统其他项目打架。</td><td>.venv 目录；启动要使用里面的 Python。</td></tr>
+<tr><td>接口 API</td><td>约定好地址、输入与输出的服务入口。</td><td>POST /api/knowledge-bases 创建知识库。</td></tr>
+<tr><td>JSON</td><td>前后端都能理解的文本数据格式。</td><td>{"question": "年假几天？"}</td></tr>
+<tr><td>数据库事务</td><td>把相关更改作为一次保存操作，成功才提交。</td><td>设置新版本和内容哈希后执行 session.commit()。</td></tr>
+<tr><td>异常</td><td>程序遇到无法正常继续的情况，用 raise 报告，用 except 处理。</td><td>文档不存在、网络超时、解析失败。</td></tr>
+<tr><td>异步 await</td><td>等待 I/O 时把执行机会让给事件循环。</td><td>await file.read() 等待读取上传文件。</td></tr>
+<tr><td>生成器 yield</td><td>一次产出一点结果，不必等全部完成才返回。</td><td>一段一段输出 SSE 事件。</td></tr>
+<tr><td>类型注解</td><td>告诉读者、编辑器或框架数据应是什么类型。</td><td>kb_id: str 表示知识库 ID 是字符串。</td></tr>
+</tbody></table>
+<p>Python 依靠缩进判断哪些语句属于同一段。看到 <code>if 条件:</code>，下面缩进的行只在条件成立时执行。看到 <code>for ... in ...:</code>，下面的行会针对每个元素执行一遍。</p>
+<p>扩展：类型注解本身不自动阻止所有错误类型；本项目的 Pydantic 请求模型才会在接口边界执行校验。普通 Python 函数依然需要调用者遵守约定。</p>
+</section>
+<section id="storage"><h2>3. 为什么要有几种存储？</h2>
+<table><tr><th>存储</th><th>保存什么</th><th>为什么不用别的代替</th></tr>
+<tr><td>SQLite</td><td>知识库、文档状态、有效版本、分块、任务。</td><td>擅长结构化查询与事务；它负责判断“哪个版本有效”。</td></tr>
+<tr><td>Milvus</td><td>BGE 数字向量及文档、版本等过滤字段。</td><td>擅长向量相似度搜索；它不是业务状态的唯一依据。</td></tr>
+<tr><td>Redis</td><td>最近 6 轮完整问答，默认 24 小时过期。</td><td>适合带过期时间的会话读写；知识库原文不放在聊天历史里。</td></tr>
+<tr><td>上传目录</td><td>PDF、DOCX、Markdown 原文件。</td><td>支持下载原文、重新解析和重建索引。</td></tr></table>
+<div class="flow"><span>KnowledgeBase<br>一个知识库</span><b>1 → 多</b><span>Document<br>多个文档</span><b>1 → 多</b><span>Chunk<br>多个版本的分块</span></div>
+<p>Job 记录一次处理任务。文档 ID 是“这份资料是谁”，版本是“它的第几次内容”，chunk_id 是“其中的哪一小块”。知识库 ID 必须参与每次检索过滤，不能只在网页上切换名称。</p>
+<p>扩展：Milvus 与 SQLite 之间没有一个自动包住两者的事务，所以项目使用“先写新索引，再切换有效版本”。如果写索引失败，旧版本依然有效；如果清理旧索引失败，版本过滤仍然可以挡住旧内容。</p>
+</section>
+<section id="documents"><h2>4. 文档为什么不能整篇塞进去？</h2>
+<p>一篇手册可能同时讲年假、报销、设备。整篇用一个向量表示会混合多个主题；整篇给模型又浪费上下文。分块就是把它切成更小、更聚焦的资料卡。</p>
+<p>当前实现的 CHUNK_SIZE=500 表示最多约 500 个字符，不是 500 tokens。CHUNK_OVERLAP=80 表示长文本连续窗口之间保留 80 个字符重叠。字符、汉字、模型 token 的数量没有固定一一对应关系。</p>
+<div class="flow"><span>第 1 块：0～499</span><b>重叠 80</b><span>第 2 块：420～919</span><b>重叠 80</b><span>第 3 块：840～...</span></div>
+<p>实际算法会尽量在后半段寻找句号或换行，因此边界不一定恰好是上面的数字。重叠太小，可能把条件和结论拆开；重叠太大，检索结果会重复，计算成本也上升。</p>
+<p>Markdown 根据 #、## 等层级保留标题；Word 根据 Heading 样式保留标题，表格行会带上表头；PDF 先提取可读文字并保留页码。扫描 PDF 只有图片，需要 OCR，本项目会明确报出这一情况。</p>
+<h3>增量更新不等于每次全量重算</h3><ol><li>对上传文件计算 SHA-256 哈希。内容完全相同就跳过。</li><li>内容改变则创建新的版本和任务。</li><li>对“标题 + 分块正文”计算内容哈希，与旧分块比较。</li><li>相同分块且 Embedding 模型相同，可以复用向量。</li><li>新版本全部写入索引成功后，切换 active_version。</li></ol>
+<p>扩展：哈希像内容指纹，用来判断一致性，不是加密，也不能还原原文。不能跨模型复用旧向量，因为不同模型的坐标空间含义不同。</p>
+</section>
+<section id="retrieval"><h2>5. 混合检索到底在算什么？</h2>
+<h3>向量召回：找意思相近的资料</h3><p>Embedding 模型把文本转换成一串数字。语义相近的文本应在这个数字空间里靠近。项目使用归一化向量与余弦相似度；分数高表示方向接近，不表示“答案一定正确”。</p>
+<h3>BM25：找关键字匹配的资料</h3><p>中文先用 jieba 分词，BM25 综合词频、词的区分能力和文档长度。它对 P1、设备编号、专有名词很有用。本项目在每次检索时对当前知识库的有效分块建立 BM25，小数据便于理解，大数据需要迁移为持久全文索引。</p>
+<h3>RRF：根据名次投票</h3><p>公式是 <code>分数 = Σ 1 / (60 + 该路排名)</code>。一个片段在两路都靠前，会得到两次较大的加分。不直接相加 BM25 分数与向量相似度，因为它们的单位和范围不同。</p>
+<p>例如 A 在向量里第 1、关键词里第 5，得分是 1/61+1/65；B 只在向量里第 2，得分是 1/62。因此两路都认可的 A 排名更高。</p>
+<h3>Reranker：把问题和片段一起读</h3><p>召回模型为了快，提前分别编码文本；重排序模型在查询时把“问题 + 候选片段”一起计算，通常更准确，但更耗时。先召回 30 条，再对有限候选重排，比对整个知识库逐条重排更合理。</p>
+<p>MIN_RERANK_SCORE 是过滤阈值，需要根据测试集调节。Sigmoid 把得分压到 0～1，不会自动让它变成“答案正确概率”。阈值太高容易误拒答，太低容易把无关片段交给模型。</p>
+<p>扩展：当前按内容哈希去除完全重复分块。相邻窗口虽然不同但高度相似时，仍可能占据多个候选位置，后续可比较 MMR、邻块合并等策略，并用相同测试集验证收益。</p>
+</section>
+<section id="chat"><h2>6. 多轮、引用和 SSE</h2>
+<p>“试用期也可以吗？”本身缺少“申请什么”。系统从 Redis 读取历史，让模型把问题补成“试用期员工能否申请年假？”。改写只用于理解与检索；事实依据仍应来自文档。</p>
+<p>每轮只在完整生成结束后保存一对消息。网络失败留下半截答案时，不把它当成已完成历史，以免影响下一轮。</p>
+<table><tr><th>SSE 事件</th><th>页面行为</th></tr><tr><td>status</td><td>显示“理解问题”“检索与重排序”等进度。</td></tr><tr><td>sources</td><td>显示证据编号、文件名、位置和原文。</td></tr><tr><td>delta</td><td>把一小段回答追加到页面。</td></tr><tr><td>done</td><td>显示耗时和引用检查提醒。</td></tr><tr><td>error</td><td>标记此次回答未完成。</td></tr></table>
+<p>SSE 的一个事件用空行结尾。网络传来的一个数据块可能只含半个事件，因此 JavaScript 先累积到 buffer，遇到两个换行符再解析。中文 UTF-8 字符也可能被网络分段，所以 TextDecoder 使用流式解码。</p>
+<p>引用编号由后端分配。模型可能引用不存在的 [99]，代码会检查并提示；即使编号存在，也不能证明这段文字真的支持该结论，仍需评测语义支持情况。</p>
+<p>扩展：本实现边生成边展示，引用警告在完成后给出。如果业务要求每句话审核通过后才能显示，需要先缓存答案、校验，再输出，首字延迟会更高。</p>
+</section>
+<section id="maintenance"><h2>7. 以后维护项目，按问题找文件</h2>
+<table><tr><th>你想改什么</th><th>先看哪里</th><th>改完验证什么</th></tr>
+<tr><td>换 DeepSeek 模型或调整温度</td><td>.env、app/config.py</td><td>probe_services.py --llm，再提问一题。</td></tr>
+<tr><td>切块太碎或上下文丢失</td><td>app/parsing.py、CHUNK_SIZE</td><td>重新入库，比较 Recall@K；旧索引不会自动重切。</td></tr>
+<tr><td>关键词搜不到</td><td>app/retrieval.py 的 tokens 与 BM25</td><td>打印分词结果，对照业务专有词。</td></tr>
+<tr><td>总是拒答</td><td>检索结果、MIN_RERANK_SCORE</td><td>先确认有相关证据，再考虑调阈值。</td></tr>
+<tr><td>更新后仍看到旧内容</td><td>app/ingestion.py、active_version</td><td>检查任务失败状态、分块版本和过滤条件。</td></tr>
+<tr><td>页面没有逐字出现</td><td>generation.py、web/app.js</td><td>检查 SSE 事件、网络缓冲和 done/error。</td></tr>
+<tr><td>问题越来越慢</td><td>timing、模型设备、候选数量</td><td>分别比较改写、检索、首 token 和总耗时。</td></tr></table>
+<h3>推荐的学习顺序</h3><ol><li>第 1 次：运行页面，只观察上传、提问、引用。</li><li>第 2 次：读 config.py，修改温度或候选数量，再观察。</li><li>第 3 次：读 parsing.py，用一段自己写的文字观察分块。</li><li>第 4 次：读 database.py 与 ingestion.py，理解文档版本。</li><li>第 5 次：读 retrieval.py 与 models.py，比较检索方式。</li><li>第 6 次：读 generation.py、sessions.py，再读 main.py 的接口。</li><li>最后读网页与测试，练习修改一个功能并补一条业务测试。</li></ol>
+<h3>三个小练习</h3><p>① 把手册年假从 5 天改成 8 天，用“更新”上传后重新提问，核对引用版本。② 新建另一个空知识库，问同样的问题，确认不会读到第一个库的答案。③ 故意停掉 Milvus，上传文件，观察失败任务；恢复后点重试。</p>
+<p>不要删除 volumes 目录来“解决报错”，那可能会删除持久化索引。先查看失败阶段，再检查服务和配置。</p>
+</section>
+<section id="evaluation"><h2>8. 如何知道改动真的有用？</h2>
+<p>eval/dataset.jsonl 每行是一道测试题，包括参考答案、应命中的证据和是否可回答。起步只有 15 题，适合验证流程；正式评估应扩充到真实业务问题，并留出没有用于调参的测试题。</p>
+<p>评测脚本按固定证据条目计算 Recall@K：假设一道题需要两条证据，前 K 条找到了其中一条，召回率就是 1/2。这个口径在改变分块方式时比较稳定，但若证据字符串被切断，需要重新标注证据定位，脚本会报错而不是默默给出分数。</p>
+<p>人工评审时，answer_correct 填 true 或 false；citation_supported 为每项被引用的事实填 true 或 false。没有评审的指标保留 null，表示“尚未测量”，不是 0，也不是 100%。</p>
+<p>在比较策略时保持文档、问题和 K 相同，每次只改一个变量。记录准确率提升的同时，也记录 P50/P95 延迟。P95 可以理解为“95% 的请求都不超过这个耗时”。小样本的 P95 不稳定，需要更多真实请求。</p>
+</section>
+<section id="boundaries"><h2>9. 当前边界与下一步扩展</h2>
+<p>本项目面向本机单用户学习，默认只监听 127.0.0.1。知识库 ID 过滤实现逻辑隔离，但没有登录和成员权限。上线多人服务前，需要增加身份认证、知识库授权、审计和上传安全限制。</p>
+<p>后台任务保存在数据库中，并由一个线程顺序处理。文件锁阻止两个进程同时启动同一个数据目录的 Worker。扩大并发时，要把任务领取改成数据库原子操作或使用专门队列；不能只把 --workers 改为 4。</p>
+<p>当前 SQL 元数据是 SQLite。切换 PostgreSQL 不只是更改一个连接字符串：还需安装驱动、迁移结构、验证事务和并发行为，并重新跑业务测试。</p>
+<p>扫描 PDF 的 OCR、复杂表格、PDF 标题识别、跨段证据验证、更强拒答判定和大规模 BM25 都是后续明确可扩展的方向。文档入库与检索接口已拆分，方便逐步替换。</p>
+</section>

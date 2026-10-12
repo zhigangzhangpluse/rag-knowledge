@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>知源 · 知识库问答</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header><div><span class="brand">知源</span><span class="muted">让每个回答都有出处</span></div><span id="mode">正在连接服务…</span></header>
+  <main>
+    <aside>
+      <p class="eyebrow">KNOWLEDGE WORKSPACE</p>
+      <h1>你的知识，<br>随问随答。</h1>
+      <label for="kb">当前知识库</label>
+      <select id="kb"><option value="">请创建知识库</option></select>
+      <form id="kb-form"><input id="kb-name" aria-label="新知识库名称" placeholder="例如：员工制度" maxlength="100" required><button>创建</button></form>
+      <div class="divider"></div>
+      <h2>文档管理</h2>
+      <p class="muted">支持 PDF、Word（.docx）、Markdown，最大 20MB。</p>
+      <form id="upload-form"><input id="file" aria-label="选择知识文档" type="file" accept=".pdf,.docx,.md,.markdown" required><button id="upload-button">上传并入库</button></form>
+      <input id="replacement" type="file" accept=".pdf,.docx,.md,.markdown" hidden>
+      <div id="documents" class="stack"></div>
+      <h2>处理任务</h2><div id="jobs" class="stack"></div>
+      <a class="help" href="/docs" target="_blank" rel="noopener">查看接口文档 ↗</a>
+      <a class="help" href="/learn" target="_blank" rel="noopener">打开中文逐行学习手册 ↗</a>
+    </aside>
+    <section class="chat-panel">
+      <div class="chat-heading"><div><p class="eyebrow">ASK YOUR DOCUMENTS</p><h2>知识问答</h2></div><button id="new-chat" class="secondary">新建对话</button></div>
+      <div id="messages" aria-live="polite"><div class="welcome"><span class="symbol">✳</span><h2>从一个好问题开始</h2><p>先选择知识库并上传文档。<br>回答会附上原文片段，方便你逐条核对。</p></div></div>
+      <div id="status" role="status">准备就绪</div>
+      <form id="chat-form"><textarea id="question" aria-label="你的问题" placeholder="这份文档中，关于……是如何规定的？" rows="3" maxlength="1000" required></textarea><button id="send">发送问题 ↗</button></form>
+      <p class="footnote">请核对关键结论的引用。文档未提供依据时，系统应说明证据不足。</p>
+    </section>
+  </main>
+  <div id="toast" role="alert" hidden></div>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>

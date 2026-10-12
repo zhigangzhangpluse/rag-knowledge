@@ -1,0 +1,15 @@
+{"id":"leave_days","question":"正式员工每年有几天年假？","answer":"5 天","evidence":["正式员工每年享有 5 天带薪年假"],"answerable":true,"category":"事实查询"}
+{"id":"leave_notice","question":"申请年假要提前多久？","answer":"3 个工作日","evidence":["提前 3 个工作日提交申请"],"answerable":true,"category":"事实查询"}
+{"id":"probation_leave","question":"试用期员工能申请年假吗？","answer":"不能","evidence":["试用期员工不能申请年假"],"answerable":true,"category":"否定事实"}
+{"id":"rollover","question":"今年没用完的年假能带到明年吗？","answer":"不能跨年度结转","evidence":["年假不能跨年度结转"],"answerable":true,"category":"语义改写"}
+{"id":"expense_deadline","question":"出差结束后最迟多久报销？","answer":"15 个自然日","evidence":["15 个自然日内提交报销申请"],"answerable":true,"category":"事实查询"}
+{"id":"expense_documents","question":"报销要提供什么资料？","answer":"有效发票和出差审批单","evidence":["有效发票和出差审批单"],"answerable":true,"category":"事实查询"}
+{"id":"hotel_compare","question":"一线城市与其他城市的住宿报销上限分别是多少？","answer":"500 元和 350 元","evidence":["每晚 500 元","每晚 350 元"],"answerable":true,"category":"综合查询"}
+{"id":"over_budget","question":"住宿超过标准怎么办？","answer":"需要部门负责人事先书面批准","evidence":["部门负责人事先书面批准"],"answerable":true,"category":"语义改写"}
+{"id":"device","question":"新人什么时候可以申请电脑？","answer":"入职当天","evidence":["入职当天可以申请一台办公笔记本电脑"],"answerable":true,"category":"语义改写"}
+{"id":"urgent","question":"紧急设备故障工单应该标记什么？","answer":"P1","evidence":["紧急设备故障应在工单中标注 P1"],"answerable":true,"category":"关键词"}
+{"id":"it_hours","question":"IT 服务台几点上班？","answer":"工作日 09:00 至 18:00","evidence":["工作日 09:00 至 18:00"],"answerable":true,"category":"事实查询"}
+{"id":"remote","question":"每周最多能远程办公几天，提前多久申请？","answer":"2 天，提前 1 个工作日","evidence":["每周最多申请 2 天远程办公","提前 1 个工作日"],"answerable":true,"category":"综合查询"}
+{"id":"salary","question":"公司今年涨薪比例是多少？","answer":"证据不足","evidence":[],"answerable":false,"category":"无答案"}
+{"id":"meal","question":"午餐补贴每天多少钱？","answer":"证据不足","evidence":[],"answerable":false,"category":"无答案"}
+{"id":"followup","question":"试用期也可以吗？","standalone_question":"试用期员工能否远程办公？","history":[{"role":"user","content":"正式员工每周能远程办公几天？"},{"role":"assistant","content":"每周最多 2 天。"}],"answer":"暂不适用","evidence":["试用期员工暂不适用远程办公安排"],"answerable":true,"category":"多轮追问"}
