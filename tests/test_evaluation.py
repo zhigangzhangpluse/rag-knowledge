@@ -1,5 +1,5 @@
 """评测统计不能把未标注值当作正确结果，也不能把 false 当作缺失。"""
-from scripts.evaluate import summarize
+from scripts.evaluation.evaluate import summarize
 
 
 def test_unrated_metrics_are_unknown():

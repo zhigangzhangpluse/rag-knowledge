@@ -9,7 +9,6 @@ data/
 models/
 volumes/
 reports/*
-!reports/verification.md
 .ruff_cache/
 .mypy_cache/
 *.log

@@ -7,7 +7,7 @@ import re
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 NOTES = json.loads((ROOT / "docs/file_notes.json").read_text(encoding="utf-8"))
 WORDS = {
     "settings": "本次运行的配置", "database": "数据库会话工厂", "session": "当前数据库事务会话",

@@ -162,14 +162,14 @@
     "purpose": "依次运行自动测试、Python 编译检查和 JavaScript 语法检查。",
     "knowledge": "测试验证行为，语法检查只验证代码可解析，两者不能互相替代。PYTEST_DISABLE_PLUGIN_AUTOLOAD 减少外部 pytest 插件对项目测试的干扰。"
   },
-  "scripts/probe_services.py": {
+  "scripts/verification/probe_services.py": {
     "purpose": "按命令行开关独立检查真实 Milvus、Redis、DeepSeek 和 BGE，把非敏感状态保存到报告。",
     "knowledge": "--llm 会消耗少量真实额度；--models 会下载大型模型。探针成功只能证明被检查的组件，不代表整条问答链已通过。",
     "functions": {
       "main": "解析检查选项，逐项调用真实依赖，捕获错误类型，保存报告并用退出码表达是否有失败。"
     }
   },
-  "scripts/evaluate.py": {
+  "scripts/evaluation/evaluate.py": {
     "purpose": "对相同测试题比较三种检索策略，生成待人工审阅的回答与引用报告，并汇总人工标注。",
     "knowledge": "Recall@K 在此按预先标注证据的覆盖率计算。回答正确性和引用语义支持须人工审核，缺少审核时保留 null。延迟包含问题改写和可选生成，不等于只测检索模型速度。",
     "functions": {
@@ -178,7 +178,7 @@
       "main": "读取评测参数，检查证据存在，运行三种策略或汇总已有人工评分，最后写出 JSON。"
     }
   },
-  "scripts/build_guide.py": {
+  "scripts/docs/build_guide.py": {
     "purpose": "从真实源文件生成带行号的中文手册，结合人工编写的模块说明和语法树解释，不读取真实密钥。",
     "knowledge": "AST 是代码的结构化表示，可以区分赋值、循环、条件和函数调用。生成器用 HTML 转义防止示例代码变成可执行标签。代码改变后应重新生成并检查手册。"
   },
@@ -209,7 +209,7 @@
   },
   "compose.yaml": {
     "purpose": "默认本机部署：真实 Milvus 单机服务和 Redis，端口仅绑定本机。",
-    "knowledge": "Milvus 使用官方内嵌 etcd 与本地存储模式，避免依赖无法下载的 MinIO 镜像。RAG_VOLUME_DIR 指向 D 盘持久目录。适合本机学习，不是高可用集群。"
+    "knowledge": "Milvus 使用内嵌 etcd 与本地持久存储的单机模式。RAG_VOLUME_DIR 指定宿主机目录，模板默认 ./volumes，本机 .env 可覆盖为 D 盘。适合单机部署，不是高可用集群。"
   },
   ".env.example": {
     "purpose": "可公开分享的配置模板；真实密钥只填写在本地 .env。",
@@ -225,7 +225,7 @@
   },
   "requirements.lock.txt": {
     "purpose": "记录本机验证环境里每个依赖的精确版本，便于重新安装同一环境。",
-    "knowledge": "包含直接和传递依赖；例如你安装 LangChain，它又依赖 Pydantic 等工具。锁文件不是源码，不要逐包手动编辑。"
+    "knowledge": "固定核心运行和测试依赖的实际版本，提供可复现的安装基础；不同平台的二进制依赖仍需验证。浏览器验收依赖单独放在 requirements-browser.txt。"
   },
   "pytest.ini": {
     "purpose": "配置 pytest 的测试目录和默认简洁输出。",
@@ -240,8 +240,8 @@
     "knowledge": "这是示例业务数据，不是代码；评测题中的证据引用此文件。修改资料后应同步检查测试答案是否仍成立。"
   },
   "README.md": {
-    "purpose": "项目入口说明：安装、启动、评测、边界与官方参考。",
-    "knowledge": "第一次使用先读启动步骤，深入理解再读本手册。README 与详细教学文档服务于不同阅读场景。"
+    "purpose": "仓库首页：介绍项目功能、架构、技术栈、快速运行和文档入口。",
+    "knowledge": "首页提供项目概览，详细维护和逐行解析分别放在 docs 中。真实验证与设计边界使用客观记录，避免将样本结果当成生产性能。"
   },
   "docs/chapters.html": {
     "purpose": "本手册前半部分的人工编写教学内容，包含入门知识、流程和维护练习。",
@@ -251,14 +251,14 @@
     "purpose": "为每个文件保存人工编写的用途、知识点和函数说明，供手册生成器使用。",
     "knowledge": "purpose 是用途，knowledge 是扩展知识，functions 按函数名提供业务含义。新建文件时应同步加入说明。"
   },
-  "scripts/verify_model_pipeline.py": {
+  "scripts/verification/verify_model_pipeline.py": {
     "functions": {
       "main": "建立独立测试库，导入示例资料，依次提问并保存完整事件和答案供人工核验。"
     },
     "knowledge": "该脚本使用独立数据库、本地向量比较和内存会话。它验证模型协作，不验证 Milvus/Redis。运行会消耗少量 API 额度。",
     "purpose": "用真实 BGE 和 DeepSeek 验证单轮问答、多轮追问与无答案拒答，测试资料是虚构员工手册。"
   },
-  "reports/verification.md": {
+  "docs/verification.md": {
     "knowledge": "组件可调用、模拟集成通过、真实端到端通过，是三个不同层次的证据。",
     "purpose": "记录当前已经获得的验证证据、未完成项和下一步，避免把演示模式当作真实服务验收。"
   },
@@ -266,15 +266,15 @@
     "purpose": "检查评测汇总口径，保证未评审显示未知、人工判错计入失败。",
     "knowledge": "None 表示未知，False 表示已判断为错误；统计时不能用简单的真假判断混淆两者。"
   },
-  "scripts/install-runtime.ps1": {
-    "purpose": "在管理员权限下安装 WSL 和 Docker，将 Docker 程序、虚拟磁盘及安装临时文件指向 D:/RAGRuntime，不自动重启。",
+  "deploy/windows/install-runtime.ps1": {
+    "purpose": "可选的 Windows D 盘 Docker/WSL 安装辅助脚本；部署项目不要求执行此脚本。",
     "knowledge": "仅在明确需要安装时运行；先验证官方安装包签名，再安装。WSL 使用 --no-distribution 避免额外安装 Ubuntu。Docker 的许可协议留待首次启动处理。日志与阶段状态保存在 D 盘。"
   },
   "scripts/start-infra.ps1": {
-    "knowledge": "这是日常启动基础服务的命令，不会重新安装 Docker；.env 的 RAG_VOLUME_DIR 决定数据盘。--wait 会检查各容器健康状态，失败时脚本明确停止。",
+    "knowledge": "DockerPath 默认从 PATH 查找 docker，也支持显式传入完整路径；先验证引擎和配置，再等待 Milvus 与 Redis 健康。此脚本不会安装 Docker。",
     "purpose": "在 Docker 引擎就绪后启动项目的 Milvus 和 Redis 容器，检查配置并等待服务健康。"
   },
-  "scripts/verify_real_stack.py": {
+  "scripts/verification/verify_real_stack.py": {
     "purpose": "真实服务验收：验证 FastAPI、BGE、Milvus、Redis、DeepSeek 的业务链路。",
     "knowledge": "使用独立 UUID 集合与数据库隔离验收数据，直接查询 Milvus 检查旧版本和删除同步；Redis 使用新客户端读取历史，避免把内存会话误当持久化成功。真实 API 调用会消耗额度。",
     "functions": {
@@ -282,15 +282,11 @@
       "passed": "记录已通过检查并即时输出进度。"
     }
   },
-  "compose.distributed.yaml": {
-    "purpose": "保留原外置 etcd、MinIO、Milvus、Redis 四容器配置作为架构参考。",
-    "knowledge": "该文件不是默认启动配置；当前固定 MinIO 镜像拉取失败，不能当作已验证可运行方案。不要与默认 compose 同时启动。"
-  },
   "deploy/embedEtcd.yaml": {
     "purpose": "配置 Milvus 内嵌的 etcd 元数据服务。",
     "knowledge": "etcd 保存 Milvus 元数据；容器内部 2379 不映射到宿主机。按修订号压缩历史记录，数据由 Milvus 持久目录保存。"
   },
-  "scripts/verify_browser.py": {
+  "scripts/verification/verify_browser.py": {
     "purpose": "通过独立无界面 Edge 检查真实问答页面和学习手册，并保存截图与验收结果。",
     "knowledge": "Playwright 操作独立浏览器实例，不读取日常浏览器资料。expect 等待网页达到预期状态；截图供人工观察排版。运行前需启动服务并准备示例知识库，额外依赖见 requirements-browser.txt。",
     "functions": {
@@ -301,7 +297,7 @@
     "purpose": "浏览器验收可选依赖，日常运行问答项目不需要安装。",
     "knowledge": "固定 Playwright 版本，复用已安装的 Edge，不额外下载浏览器。pip install -r requirements-browser.txt 可安装。"
   },
-  "scripts/export_guide_markdown.py": {
+  "scripts/docs/export_guide_markdown.py": {
     "purpose": "将系统教学章节、各文件职责、完整源码和逐行解析导出为 Markdown，便于离线阅读与记笔记。",
     "knowledge": "HTMLParser 是 Python 标准库的 HTML 解析器；先构建节点树，再把标题、列表、表格转换成 Markdown。源码使用代码围栏完整保存，解释单独按行号列出，避免源码中的竖线破坏表格。Markdown 覆盖清单记录源文件哈希，用来发现过期文档。",
     "functions": {
@@ -311,5 +307,21 @@
       "text": "递归收集节点中纯文本。",
       "collect": "收集 HTML 表格行和单元格。"
     }
+  },
+  "docs/architecture.md": {
+    "purpose": "说明系统模块、存储职责和业务一致性设计。",
+    "knowledge": "文档中的路径相对项目根目录；命令执行前检查环境与所需参数。验证结果只支持明确记录的范围。"
+  },
+  "docs/deployment.md": {
+    "purpose": "提供通用部署、配置、备份和故障排查步骤。",
+    "knowledge": "文档中的路径相对项目根目录；命令执行前检查环境与所需参数。验证结果只支持明确记录的范围。"
+  },
+  "docs/evaluation.md": {
+    "purpose": "说明测试、真实验收与人工评测方法。",
+    "knowledge": "文档中的路径相对项目根目录；命令执行前检查环境与所需参数。验证结果只支持明确记录的范围。"
+  },
+  "docs/README.md": {
+    "purpose": "项目文档入口及学习手册维护方式。",
+    "knowledge": "文档中的路径相对项目根目录；命令执行前检查环境与所需参数。验证结果只支持明确记录的范围。"
   }
 }

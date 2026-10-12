@@ -1,10 +1,8 @@
-# Start the project's Milvus and Redis containers after Docker Desktop is ready.
+# Start Milvus and Redis using Docker from PATH or an explicit executable path.
+param([string]$DockerPath = 'docker')
 $ErrorActionPreference = 'Stop'
 Set-Location (Split-Path -Parent $PSScriptRoot)
-$dockerCommand = 'D:\RAGRuntime\Docker\resources\bin\docker.exe'
-if (-not (Test-Path -LiteralPath $dockerCommand)) {
-    $dockerCommand = (Get-Command docker -ErrorAction Stop).Source
-}
+$dockerCommand = (Get-Command $DockerPath -ErrorAction Stop).Source
 & $dockerCommand info --format '{{.ServerVersion}}'
 if ($LASTEXITCODE -ne 0) {
     throw 'Docker engine is not ready. Restart Windows if required, then open Docker Desktop and finish first-run setup.'

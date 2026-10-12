@@ -85,19 +85,19 @@
     "sha256": "71809a151eae95eae776b3f2281a1e00627fe9bfbcc299bd9ca253bf0005743d"
   },
   {
-    "file": "scripts/probe_services.py",
+    "file": "scripts/verification/probe_services.py",
     "lines": 51,
-    "sha256": "0d3c36524424c2596131a4676392278faa4e4c0dceaffd4fa2f7940a46fd4470"
+    "sha256": "fb0d3c344f7d29cfdf53598e392cc3dbf81f73c5bba1206e6b61b77d7505990e"
   },
   {
-    "file": "scripts/evaluate.py",
+    "file": "scripts/evaluation/evaluate.py",
     "lines": 84,
-    "sha256": "88ded2e53ab32251f5d56a83016e091c85cfcd7d0366c636b6a80a101c7b56c1"
+    "sha256": "7e1d1f424af5ce0cce2d94b0f308f9ab87fbd313aedf99b04358c61487e01b9c"
   },
   {
-    "file": "scripts/build_guide.py",
+    "file": "scripts/docs/build_guide.py",
     "lines": 419,
-    "sha256": "0995d9bb5f8e2793ae90d58af08065e468e3894f00678f8dd58e5de765946b1c"
+    "sha256": "4c2db597f0dc014ae0086a19fbcf258d3e29e3a5fc15669d42d8959f1b8792bd"
   },
   {
     "file": "tests/__init__.py",
@@ -132,12 +132,12 @@
   {
     "file": ".env.example",
     "lines": 23,
-    "sha256": "8893ebf48a6504d95a2a0b2fc7ed10b3769ce226f8e447e542895b390b970478"
+    "sha256": "7895444c63639a70be4063f4b7d5be9c65e920354b0f1d4ebeee263575bc0322"
   },
   {
     "file": ".gitignore",
-    "lines": 16,
-    "sha256": "24e7ffde8aec06663dbf39fba9704bf0e8877cdc82978281b31988de0b86ff66"
+    "lines": 15,
+    "sha256": "322f9077c1f7899be18ae247a5ffff5fbf59f14a1f94bc782e8f72e0b6e66cbf"
   },
   {
     "file": "requirements.txt",
@@ -146,8 +146,8 @@
   },
   {
     "file": "requirements.lock.txt",
-    "lines": 100,
-    "sha256": "88a9484caff63ee048610fba0a91254d09c38cc836c6bc25485568400ce9cee6"
+    "lines": 98,
+    "sha256": "9367696079b5a184fa7411ff085d2d1f1b04da728e44029178c3e9386c7bf2cc"
   },
   {
     "file": "pytest.ini",
@@ -166,53 +166,48 @@
   },
   {
     "file": "README.md",
-    "lines": 119,
-    "sha256": "1f129c090d53202e86f7b288f472ec2c919942449a03ba56d14e30778b1c79ce"
+    "lines": 120,
+    "sha256": "08221971a878b2d9eb4e8367b2b9409644e44069daf1fe69d5d900f03e2ac24a"
   },
   {
     "file": "docs/chapters.html",
     "lines": 109,
-    "sha256": "c1e4d5a302dbe43bdd9025bdcf1cac903ac847e7222919aecf45de6ebe04773f"
+    "sha256": "fc436680d0a20baa87ee0d6abdbc4e06017a159b9b55ca62ea9a616a8bdfc2db"
   },
   {
     "file": "docs/file_notes.json",
-    "lines": 315,
-    "sha256": "4942cfae6eb593eb6a70156354aa074ed87a649ddff40128e0d2913c3bda0809"
+    "lines": 327,
+    "sha256": "e5f02ddef6f1393bd0b362df4b115be6e2f0deebceb9e245756a7060f0e6c432"
   },
   {
-    "file": "scripts/verify_model_pipeline.py",
+    "file": "scripts/verification/verify_model_pipeline.py",
     "lines": 53,
-    "sha256": "45aa02f06732e4d1829a47bfb478a89b8fee63e8dac844443f2685d6cdb11e2d"
+    "sha256": "499a65995f6a3fc1f637c2a5ae1c875f34c3aa3b9831ed6c103c6b6c934609a8"
   },
   {
-    "file": "reports/verification.md",
-    "lines": 38,
-    "sha256": "fea87f3283c78a206fb2ab4022b69d64871dba91660691e9cfca170756532bc1"
+    "file": "docs/verification.md",
+    "lines": 32,
+    "sha256": "6ed3e56477a63f872260aa66778a1a5bc73b46f5b3c75565b25c6b780a2f4a03"
   },
   {
     "file": "tests/test_evaluation.py",
     "lines": 21,
-    "sha256": "aecd02f7afaa0d9679f10f2bffb7e40df9bc810e93528697dfc209ff948d95c7"
+    "sha256": "ed846c15c72f8488a4b26c989ae7d545ebf362a2c6442fc9d25734e782c5388b"
   },
   {
-    "file": "scripts/install-runtime.ps1",
+    "file": "deploy/windows/install-runtime.ps1",
     "lines": 35,
     "sha256": "4600b831335961efab5a22829edf7d6eacb803989767772893367c388c8339a1"
   },
   {
     "file": "scripts/start-infra.ps1",
-    "lines": 16,
-    "sha256": "25a294b448b4228bfcbe99466aa98f998a8dfa95c33f9f642d673fc3f042cb2b"
+    "lines": 14,
+    "sha256": "d53c4c037072168ef954ee1910e09e7da7ed00c933e20dafa06827f833e250ae"
   },
   {
-    "file": "scripts/verify_real_stack.py",
+    "file": "scripts/verification/verify_real_stack.py",
     "lines": 86,
-    "sha256": "747aca3a9bdd568483d0859122e37d117fe9f1249d929612e02cfbbe495933e9"
-  },
-  {
-    "file": "compose.distributed.yaml",
-    "lines": 67,
-    "sha256": "4194fe7b28298f3e040362c9197a0f86c1fc67b4e7dcbe81ec1c80e1903d57f4"
+    "sha256": "9da4fa7149e0e5037ca83888abbc027026969bf0fbd2f3c511f72b9b78737749"
   },
   {
     "file": "deploy/embedEtcd.yaml",
@@ -220,9 +215,9 @@
     "sha256": "0efe4601853af24b84119d00693f2d0568ac574a47d58fd45d8a356efb964b9c"
   },
   {
-    "file": "scripts/verify_browser.py",
+    "file": "scripts/verification/verify_browser.py",
     "lines": 42,
-    "sha256": "cedb2a30e24cbd3ee540319c993b8e29c35dbdb2a9a757b5f52e51852e2fed7a"
+    "sha256": "93da8e0f20b0144f2803b589b99a10753c383a2b4127adcda5f8a31fbe73db64"
   },
   {
     "file": "requirements-browser.txt",
@@ -230,8 +225,28 @@
     "sha256": "a7bc75cbc21ab4e6b99e4dc78edcbd312e5f8097ed7136131d3272cb45377cc2"
   },
   {
-    "file": "scripts/export_guide_markdown.py",
+    "file": "scripts/docs/export_guide_markdown.py",
     "lines": 124,
-    "sha256": "8f9b40fab40982701456bf0653ea0185652c74b1b5f1fd40703220debac772cd"
+    "sha256": "d65fe0d61db89b8aa4cb5ef8aca758f13bc94c03baa9d8111f14fbda61f8ee82"
+  },
+  {
+    "file": "docs/architecture.md",
+    "lines": 47,
+    "sha256": "89f4dfde3151eaf58fcf59ce8a29c3aece08f4963c210176bfbf78a106fefedb"
+  },
+  {
+    "file": "docs/deployment.md",
+    "lines": 66,
+    "sha256": "8f88a3a89bf1f761315cba8b59e36cefc8f361352ec6c95a28da07ebe6293000"
+  },
+  {
+    "file": "docs/evaluation.md",
+    "lines": 44,
+    "sha256": "f514500f80974a827b1c1753501879156068de91f16dfa8b0d64a600830802d3"
+  },
+  {
+    "file": "docs/README.md",
+    "lines": 21,
+    "sha256": "7699cca6bcca9de28825e9b9c5cdffb78c579942ac561e286e143f2571cfb071"
   }
 ]
