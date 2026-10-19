@@ -1,4 +1,8 @@
-// 页面只负责交互；所有检索、密钥与文件处理都在后端。
+// ----------------------------------------------------------------------
+// 页面只负责选知识库、上传、发问和展示；模型调用与密钥留在后端。
+// 阅读顺序：api 看普通请求，refresh 看任务状态，聊天提交处理看流式事件。
+// 面试问：为什么不能把模型密钥写在 JS？答：浏览器下载的源码用户都能看到，无法保密。
+// ----------------------------------------------------------------------
 const $ = (id) => document.getElementById(id);
 let sessionId = crypto.randomUUID().replaceAll('-', '');
 let activeRequest = null;
@@ -11,6 +15,11 @@ function notify(message) {
   setTimeout(() => { $('toast').hidden = true; }, 6000);
 }
 
+// ----------------------------------------------------------------------
+// fetch 遇到 HTTP 400/500 通常不会自动抛异常，所以要显式检查 response.ok。
+// 类似用法：网络断开会 reject，业务错误则看响应状态和响应体，这两类都要处理。
+// 代码示例：await api(path, { method: "DELETE" })，调用方负责展示失败提示。
+// ----------------------------------------------------------------------
 async function api(path, options = {}) {
   const response = await fetch(path, options);
   if (!response.ok) {
@@ -41,6 +50,11 @@ async function loadKBs(selected) {
   await refresh();
 }
 
+// ----------------------------------------------------------------------
+// 轮询获取文档与任务状态，上传受理后进度要靠后续查询得知。
+// Promise.all 并发等待互不依赖的请求，减少串行等待；不是开两个 CPU 计算线程。
+// 面试问：轮询与 SSE 区别？答：轮询反复主动询问，SSE 保持一次响应持续接收事件。
+// ----------------------------------------------------------------------
 async function refresh() {
   const kb = $('kb').value;
   if (!kb) return;
@@ -112,6 +126,11 @@ function resetChat() {
 $('new-chat').onclick = resetChat;
 $('kb').onchange = () => { resetChat(); refresh().catch((error) => notify(error.message)); };
 
+// ----------------------------------------------------------------------
+// 用 textContent 展示回答，文本中的 HTML 不会直接当标签执行。
+// 类似用法：若改为 Markdown 渲染，应同时处理不可信 HTML 和链接安全。
+// 面试问：为什么不用 innerHTML 省事？答：模型输出和文档都可能带恶意内容，直接插入有 XSS 风险。
+// ----------------------------------------------------------------------
 function message(role, text) {
   $('messages').querySelector('.welcome')?.remove();
   const row = document.createElement('div');
@@ -157,6 +176,12 @@ $('chat-form').onsubmit = async (event) => {
   try {
     const response = await fetch(`${kbPath(kb)}/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: activeRequest.signal, body: JSON.stringify({ question, session_id: sessionId }) });
     if (!response.ok) throw new Error(`问答请求失败：${response.status}`);
+// ----------------------------------------------------------------------
+// 读取网络流要处理两种边界：中文字符可能跨字节块，一条 SSE 事件也可能跨读取块。
+// TextDecoder 的 stream 模式处理字符边界；buffer 累积后按空行切分完整事件。
+// 例如第一次只收到 event: del，下一次收到 ta 和 data，不能把第一次当成完整事件解析。
+// 面试问：每次 reader.read() 都是一句回答吗？答：不是，网络分块和业务事件边界没有保证一致。
+// ----------------------------------------------------------------------
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let buffer = '';

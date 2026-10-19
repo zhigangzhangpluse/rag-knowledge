@@ -1,3 +1,9 @@
+# ----------------------------------------------------------------------
+# 安装依赖：先创建独立 .venv，再按锁定版本安装，避免和其他项目抢依赖。
+# 用法示例：powershell -File scripts/setup.ps1 -Python python
+# .env.example 是可公开模板，.env 是本机配置；已有 .env 不会被模板覆盖。
+# 面试问：requirements 与 lock 文件作用？答：前者表达依赖，锁定版本帮助复现已验证环境。
+# ----------------------------------------------------------------------
 param([string]$Python = 'python')
 $ErrorActionPreference = 'Stop'
 Set-Location (Split-Path -Parent $PSScriptRoot)

@@ -1,4 +1,7 @@
-"""FastAPI 入口：本机单用户知识库服务，默认监听 127.0.0.1。"""
+# ----------------------------------------------------------------------
+# 阅读入口：组装各模块并暴露 HTTP 接口，同时提供静态操作页面。
+# FastAPI 装饰器把 URL 和处理函数绑定。Pydantic 限制输入长度和会话 ID 格式。FileResponse 返回文件，StreamingResponse 返回迭代器产生的数据。默认本机使用；知识库 ID 不是登录凭证。
+# ----------------------------------------------------------------------
 from contextlib import asynccontextmanager
 from pathlib import Path
 from types import SimpleNamespace
@@ -29,6 +32,16 @@ class ChatInput(BaseModel):
     session_id: str = Field(default_factory=lambda: uuid4().hex, pattern=r"^[a-f0-9]{32}$")
 
 
+# ----------------------------------------------------------------------
+# 应用工厂把数据库、模型、索引、历史存储组装到一起，像把零件接成机器。
+# 测试时换成替身，生产时接 BGE/Milvus/Redis，接口层不必复制两套业务。
+# FastAPI 校验请求格式；业务服务处理入库和问答；页面负责交互，这是职责分工。
+# async 适合等待 I/O，不会自动让 CPU 密集的模型推理变快，阻塞调用要考虑线程或任务队列。
+# 本地 Origin 检查不等于用户认证：无 Origin 的客户端仍可能访问，公开部署要补充鉴权。
+# 面试问：上传为什么返回 202？答：已经受理后台任务，不表示解析和向量化已经完成。
+# 流式请求一旦发出响应头，后续失败通常靠 SSE error 事件说明，不能再改成普通 HTTP 错误。
+# 127.0.0.1 表示运行服务那台电脑自身；公开源代码不会自动获得一个公网服务地址。
+# ----------------------------------------------------------------------
 def create_app(settings=None, start_worker=True):
     settings = settings or Settings()
     database = make_database(settings)

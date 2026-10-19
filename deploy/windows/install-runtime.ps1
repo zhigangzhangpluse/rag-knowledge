@@ -1,4 +1,9 @@
-# Install the authorized runtime on D: without automatically restarting Windows.
+# ----------------------------------------------------------------------
+# Windows 运行环境安装脚本：面向本机 D 盘部署，实际路径与开关以脚本参数为准。
+# Docker Desktop 管理容器环境，WSL 2 提供 Linux 运行基础，不是项目的 Python 虚拟环境。
+# 安装程序成功退出不一定意味着立即可用，系统功能启用后可能需要重启并完成首次设置。
+# 面试问：容器和 venv 有什么区别？答：venv 隔离 Python 依赖，容器提供更完整的进程运行环境。
+# ----------------------------------------------------------------------
 $ErrorActionPreference = 'Stop'
 $runtimeRoot = 'D:\RAGRuntime'
 $installerPath = Join-Path $runtimeRoot 'downloads\DockerDesktopInstaller.exe'

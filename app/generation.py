@@ -1,4 +1,7 @@
-"""使用 LangChain 组织问题改写、证据提示词与 DeepSeek 流式生成。"""
+# ----------------------------------------------------------------------
+# 阅读入口：调用 DeepSeek、组织 LangChain 提示词链、改写追问、流式生成、核验引用并保存会话。
+# LangChain 的竖线运算符把提示模板、模型和文本解析器串成流水线。invoke 一次取完整结果，stream 逐段取结果。文档内容是证据数据，不能覆盖系统规则。引用编号存在性检查不能代替语义真实性审核。
+# ----------------------------------------------------------------------
 import json
 import re
 import time
@@ -9,6 +12,14 @@ from sqlalchemy import select
 from app.database import Chunk, Document
 
 
+# ----------------------------------------------------------------------
+# 生成模型负责根据找到的证据组织答案；Embedding 模型负责找资料，两者不是一回事。
+# 这里用 ChatOpenAI 客户端连接兼容接口，不表示实际请求一定发给 OpenAI。
+# base_url 和 model 决定服务目标；换厂商时还需检查额外参数、流式事件和错误格式是否兼容。
+# LangChain 的 prompt | model | parser 表示依次处理，不是把三个结果做按位或运算。
+# 代码示例：chain.invoke(values) 得到完整结果，chain.stream(values) 逐段产出结果。
+# 面试问：LangChain 是大模型吗？答：不是，它组织调用流程；真正推理由模型服务完成。
+# ----------------------------------------------------------------------
 class DeepSeekLLM:
     def __init__(self, settings):
         self.settings = settings
@@ -24,6 +35,14 @@ class DeepSeekLLM:
                           max_retries=1, streaming=True, stream_usage=False,
                           extra_body={"thinking": {"type": "disabled"}})
 
+    # ----------------------------------------------------------------------
+    # 多轮问题先补全，再检索。例如先问“年假几天”，接着问“试用期呢”。
+    # 改写目标是“试用期员工是否可以申请年假”，让检索不必猜“呢”指什么。
+    # 改写可能出错，所以保留原问题，并用业务测试集检查有没有擅自加条件。
+    # 类似方案：直接拼接最近对话简单，但无关话题会污染检索；摘要更短，但可能丢失关键事实。
+    # 面试问：有历史就不用查知识库了吗？答：仍要查。历史帮助理解问题，不替代当前文档证据。
+    # 这里没历史时直接返回原问题，减少一次模型调用。
+    # ----------------------------------------------------------------------
     def rewrite(self, question, history):
         if not history:
             return question
@@ -52,7 +71,7 @@ class DeepSeekLLM:
 
 
 class DemoLLM:
-    """演示模式只摘录证据，不调用模型，不代表真实生成效果。"""
+
     def rewrite(self, question, history):
         if history and any(word in question for word in ["它", "那么", "也可以", "这个"]):
             return history[-2]["content"] + "；追问：" + question
@@ -64,6 +83,13 @@ class DemoLLM:
             yield text[start:start + 12]
 
 
+# ----------------------------------------------------------------------
+# SSE 是服务端沿着 HTTP 响应持续推送文本事件，适合逐段显示回答。
+# 一帧示例：event: delta\ndata: {"text":"你好"}\n\n；空行表示一帧结束。
+# JSON 保证文本中的换行等字符被正确转义；前端按帧解析后再取 text。
+# 类似方案：WebSocket 适合双向持续通信；本项目请求发一次、结果持续返回，用 SSE 更直接。
+# 面试问：流式会缩短总推理时间吗？答：不一定，主要降低用户看到第一段内容的等待感。
+# ----------------------------------------------------------------------
 def event(name, data):
     return "event: " + name + "\ndata: " + json.dumps(data, ensure_ascii=False) + "\n\n"
 
@@ -72,6 +98,12 @@ class ChatService:
     def __init__(self, database, retriever, sessions, llm):
         self.database, self.retriever, self.sessions, self.llm = database, retriever, sessions, llm
 
+    # ----------------------------------------------------------------------
+    # 引用先对应到原始分块，再给本次回答分配 [1]、[2] 等编号。
+    # 重新检查文档状态和版本，尽量避免检索后文档已变更的旧证据进入生成。
+    # 引用包含标题、位置、版本和正文，用户可以追溯，而不是只看一个不可验证的编号。
+    # 面试问：有引用就能证明答案正确吗？答：不能，编号存在只代表格式正确，仍需核对证据是否支持结论。
+    # ----------------------------------------------------------------------
     def sources(self, hits):
         sources = []
         with self.database() as session:
@@ -85,6 +117,16 @@ class ChatService:
                                 "heading": chunk.heading, "text": chunk.text, "score": round(hit.score, 4)})
         return sources
 
+    # ----------------------------------------------------------------------
+    # 完整问答在这里串起来：读历史 → 改写 → 检索 → 整理引用 → 生成 → 保存历史。
+    # 证据为空直接拒答，避免没有资料却调用模型凭常识编答案。
+    # 有证据时提示模型只依据证据作答，但提示词不能绝对阻止幻觉或文档中的恶意指令。
+    # 引用检查主要看编号是否存在、是否缺引用；没有自动证明每句话都被证据支持。
+    # 模型输出的“证据不足”还用于标记拒答，这只是文本启发式，不是完美的语义分类器。
+    # 面试问：首段时延和总时延有什么区别？答：前者到第一段文本，后者到整个流程结束。
+    # 生成失败会发 error，成功结束才有 done；HTTP 200 不代表已经完整生成成功。
+    # 历史在生成结束后保存；如果保存 Redis 失败，用户可能已看到文本，但流程仍以 error 结束。
+    # ----------------------------------------------------------------------
     def stream(self, kb_id, session_id, question):
         started = time.perf_counter()
         try:

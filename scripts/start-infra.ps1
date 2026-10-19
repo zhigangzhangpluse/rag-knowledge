@@ -1,4 +1,9 @@
-# Start Milvus and Redis using Docker from PATH or an explicit executable path.
+# ----------------------------------------------------------------------
+# 启动 Milvus 和 Redis：先确认 Docker 引擎可用，再校验 Compose 并等待健康检查。
+# 用法示例：powershell -File scripts/start-infra.ps1 -DockerPath docker
+# 容器进程启动不等于服务已就绪，--wait 可以减少应用太早连接导致的失败。
+# 面试问：健康检查成功证明模型可用吗？答：不能，这里只检查基础服务，模型需要另外验证。
+# ----------------------------------------------------------------------
 param([string]$DockerPath = 'docker')
 $ErrorActionPreference = 'Stop'
 Set-Location (Split-Path -Parent $PSScriptRoot)

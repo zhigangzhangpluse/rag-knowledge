@@ -1,143 +1,143 @@
 [
   {
     "file": "app/__init__.py",
-    "lines": 1,
-    "sha256": "c756881fed785d29efe492e05366be1be5c1e6897b42733f3bedc3f776eb8554"
+    "lines": 4,
+    "sha256": "36f6d058dce38bab01c27c671f7e42190f5e6008accabc9dbec2702be14a1999"
   },
   {
     "file": "app/config.py",
-    "lines": 40,
-    "sha256": "4e5eb902d3e04f8bcce3556de8eece252ef67c8f440e957c02a40cc3e97f0f63"
+    "lines": 52,
+    "sha256": "8450efcaff00c2bb476d346e2b3e8e928bc155d2ec2308a071b6732b78953df3"
   },
   {
     "file": "app/database.py",
-    "lines": 73,
-    "sha256": "e2d7094832b60f63d5a698c64a8b0800a9faf9db57ed610b0d4ea7aacb15b76b"
+    "lines": 102,
+    "sha256": "a88be5e4c5e4c1ceeb20a7ae171181129c3e53ff6082b1a2bbca884ebb2c65a8"
   },
   {
     "file": "app/parsing.py",
-    "lines": 161,
-    "sha256": "d22e09a7dc6252239e40c05a52bedc66b317713fb8a5d6f11a97e7dd32b6264f"
+    "lines": 199,
+    "sha256": "0a89571e70f43efc9b1fb6efe2bb432618e4a0dbf769eff8a5b8d3f37f1a8bf1"
   },
   {
     "file": "app/models.py",
-    "lines": 52,
-    "sha256": "08897c6e00a486526c4fc01f0329a2512cd94f820c58d1b5b21a4a5de1fbfa5d"
+    "lines": 103,
+    "sha256": "cc03e9966ae2911705de5b3cd21e21c45d8125040b89e7abe4bd1d09fc928190"
   },
   {
     "file": "app/index.py",
-    "lines": 77,
-    "sha256": "234d9f292c8c4b59185b47ddc811428e0d31723d7949cb938ed23a79161ee8e7"
+    "lines": 100,
+    "sha256": "8240b36ef4e6a52533dc7eb7ba7dcb8c1e39981d42364e656fb4ff5b1ca4979f"
   },
   {
     "file": "app/retrieval.py",
-    "lines": 74,
-    "sha256": "5c488c5bf9d1aae74c03249db3be7ba780a6e4c27b7a08a9be1d40b86b63edba"
+    "lines": 105,
+    "sha256": "04cb5f0e8b4056ac2aa5679450166b30c35b0c7cfc63609472e4ec6b3841b752"
   },
   {
     "file": "app/sessions.py",
-    "lines": 57,
-    "sha256": "bbad24420701d30bc4c2e0e45c9ea864fc85e923c452154d4933589cc83d9d0a"
+    "lines": 70,
+    "sha256": "c57af9bc8751f0fce18e90d941cc39216e5915dd51112130fed8124f6a0f860b"
   },
   {
     "file": "app/ingestion.py",
-    "lines": 198,
-    "sha256": "df4aaed46632c0214d5eab8ece91ca372c59e9cad327945b8f0a701595725513"
+    "lines": 237,
+    "sha256": "641437105cb84090c604e1602c2dd745a26ca2d8dee5675257f02f925d842770"
   },
   {
     "file": "app/generation.py",
-    "lines": 125,
-    "sha256": "a84ad6497a9a7cf9089878bcf7583dc841932426d2e51a78f57b99bda6ff3890"
+    "lines": 167,
+    "sha256": "152e63901e80273bd357733d10200c91b64f6e5acbc8790a78d065aa10c121a9"
   },
   {
     "file": "app/main.py",
-    "lines": 201,
-    "sha256": "18343a2149f8528f1ee0e78a657f64658c94e82c0f061ef78e4802ba22c14ce8"
+    "lines": 214,
+    "sha256": "03f985826327bb0ae88bfaf894adff7ebae980f834a51a3846b53501755db544"
   },
   {
     "file": "web/index.html",
-    "lines": 39,
-    "sha256": "41ef715b0cbf44c7995fa144bef15e1dedd15e92f949a84f14c76ab6c96f218d"
+    "lines": 44,
+    "sha256": "02d6b425f490306617155337a8107093c17c28eb609ed3a6479ebb089793d1a5"
   },
   {
     "file": "web/style.css",
-    "lines": 51,
-    "sha256": "241e29912437b097020716e0eb81dded92f02d0dc3eaaeb453ede3814204036d"
+    "lines": 58,
+    "sha256": "e4a9d0686f2cc478237d36caf3acbd3c3e66c1c5395e3530c74fcd61afbdfd49"
   },
   {
     "file": "web/app.js",
-    "lines": 198,
-    "sha256": "4ebf25d42dc596cacce1fa7c28e41341e606f1b14145de756351520f2d7bd3b9"
+    "lines": 223,
+    "sha256": "07507b6702bd98e4a851a36a0b690fef8b9190322d340b934f777cb292964d61"
   },
   {
     "file": "scripts/setup.ps1",
-    "lines": 16,
-    "sha256": "7ecab443c4475a64690bb90e135a4a870427f3a7f07ae51b6dd3e36acf9faba2"
+    "lines": 22,
+    "sha256": "004395f56d6b289f80b5b8cb9e1d167711239200c83ebe522e5898f66bb0ffcb"
   },
   {
     "file": "scripts/start.ps1",
-    "lines": 19,
-    "sha256": "9aedaf212e733d1904bd0a69cd0cd5679cfd4e48fae80feba7b38681ce3b9ee8"
+    "lines": 25,
+    "sha256": "bfa29cb87b4afc26206b1c690f58885220d12a382f34c6d41df4b8ff0950e688"
   },
   {
     "file": "scripts/check.ps1",
-    "lines": 12,
-    "sha256": "71809a151eae95eae776b3f2281a1e00627fe9bfbcc299bd9ca253bf0005743d"
+    "lines": 18,
+    "sha256": "c9aa26f2dcd8528c74fa9ff2b99af59cb2b82818728ae8bed9a7215a116f1932"
   },
   {
     "file": "scripts/verification/probe_services.py",
-    "lines": 51,
-    "sha256": "fb0d3c344f7d29cfdf53598e392cc3dbf81f73c5bba1206e6b61b77d7505990e"
+    "lines": 56,
+    "sha256": "0e7501d0d04389039759a8a28aa7742e53709fb836e39167e63c5faf61953d47"
   },
   {
     "file": "scripts/evaluation/evaluate.py",
-    "lines": 84,
-    "sha256": "7e1d1f424af5ce0cce2d94b0f308f9ab87fbd313aedf99b04358c61487e01b9c"
+    "lines": 92,
+    "sha256": "1cf5cb018810ca38598d2f1aa96b35efd3d1dcd3602bfc730a394af62fa853a4"
   },
   {
     "file": "scripts/docs/build_guide.py",
-    "lines": 419,
-    "sha256": "4c2db597f0dc014ae0086a19fbcf258d3e29e3a5fc15669d42d8959f1b8792bd"
+    "lines": 426,
+    "sha256": "f10d61aeda40f9fa354ffbecb4d3076b4e9e1726ca196213acc94d667eb403fd"
   },
   {
     "file": "tests/__init__.py",
-    "lines": 1,
-    "sha256": "9fe645500791e0698d9703d55116dbd0863064bcf81ba54d079f4b6bf53b05c0"
+    "lines": 4,
+    "sha256": "3d6fa54fe6dd14dcf1feaf09c02b7d7c20413f2c816142412f5a91e257ef20e8"
   },
   {
     "file": "tests/conftest.py",
-    "lines": 30,
-    "sha256": "9e24f99c3d91b308fabd475f6bfa7a95e35c32c1c8d9c2d9cd81064961585dfa"
+    "lines": 37,
+    "sha256": "326efd88585e42278561abb2300b9b09a2f33811bb38059b142ea008031c6a79"
   },
   {
     "file": "tests/test_documents.py",
-    "lines": 134,
-    "sha256": "3b7d663b486c1792396f226aca0efc4a30c1834d8243fc00b34f7d0a20efd82c"
+    "lines": 140,
+    "sha256": "ce9de5e3e152bc4bda9eeb455d80015e7fc911f0c2891a64e052ed9b37ac3971"
   },
   {
     "file": "tests/test_chat.py",
-    "lines": 66,
-    "sha256": "cab50a29e8b54889feef8b2f08498601731ba1aa938f88e9e8af4af97c0fb50b"
+    "lines": 73,
+    "sha256": "1f8a769352c9f83669942b93da9e8dae50ebe402310bdff5796e22765242b5cf"
   },
   {
     "file": "tests/test_parsing.py",
-    "lines": 81,
-    "sha256": "55e36460f3b9074068c61764519351d4d657bae1c6add318bba45696561c8700"
+    "lines": 87,
+    "sha256": "77f6eb1488523aa913e1c0ff45fb912698861526fc8d337dc2d7f358ac7ff5f8"
   },
   {
     "file": "compose.yaml",
-    "lines": 36,
-    "sha256": "88f81e56fe9e74d8a7b3f363bb1b64e814f9351656df9d8783771f038099648a"
+    "lines": 44,
+    "sha256": "00d297762de5d82e08f186f348915e3a2496b3008ea0d903cb558dcc5f955e9a"
   },
   {
     "file": ".env.example",
-    "lines": 23,
-    "sha256": "7895444c63639a70be4063f4b7d5be9c65e920354b0f1d4ebeee263575bc0322"
+    "lines": 28,
+    "sha256": "f03f6177501243e7398df72c850485b33ccdb50ec825187ee5684136a17b569d"
   },
   {
     "file": ".gitignore",
-    "lines": 15,
-    "sha256": "322f9077c1f7899be18ae247a5ffff5fbf59f14a1f94bc782e8f72e0b6e66cbf"
+    "lines": 16,
+    "sha256": "82ababa594db8e20dcccff8c6eeb99ea57be77a3b2f88e40caa19052e6a33235"
   },
   {
     "file": "requirements.txt",
@@ -181,8 +181,8 @@
   },
   {
     "file": "scripts/verification/verify_model_pipeline.py",
-    "lines": 53,
-    "sha256": "499a65995f6a3fc1f637c2a5ae1c875f34c3aa3b9831ed6c103c6b6c934609a8"
+    "lines": 58,
+    "sha256": "9a24c5b131e8345e289fcab8d7fdecae855b49bd28d0388cded55c2c5c13fbd7"
   },
   {
     "file": "docs/verification.md",
@@ -191,33 +191,33 @@
   },
   {
     "file": "tests/test_evaluation.py",
-    "lines": 21,
-    "sha256": "ed846c15c72f8488a4b26c989ae7d545ebf362a2c6442fc9d25734e782c5388b"
+    "lines": 27,
+    "sha256": "031a0fae1f0719cd88d99ff511f9929439fe97a63487c622d0eca753c7e25913"
   },
   {
     "file": "deploy/windows/install-runtime.ps1",
-    "lines": 35,
-    "sha256": "4600b831335961efab5a22829edf7d6eacb803989767772893367c388c8339a1"
+    "lines": 40,
+    "sha256": "67c4cf4c7c352c3c553a6c15af02822480b0f50004ba7aa2d39a090d12993bf8"
   },
   {
     "file": "scripts/start-infra.ps1",
-    "lines": 14,
-    "sha256": "d53c4c037072168ef954ee1910e09e7da7ed00c933e20dafa06827f833e250ae"
+    "lines": 19,
+    "sha256": "fa830491c33a903fab21df6a9faa0ec6bfecca2572922358c106b7cfc79af37d"
   },
   {
     "file": "scripts/verification/verify_real_stack.py",
-    "lines": 86,
-    "sha256": "9da4fa7149e0e5037ca83888abbc027026969bf0fbd2f3c511f72b9b78737749"
+    "lines": 91,
+    "sha256": "401a2f190f3f45a2841d18ccb87524b9a5a16a84f0d9e738d3706fea73708777"
   },
   {
     "file": "deploy/embedEtcd.yaml",
-    "lines": 5,
-    "sha256": "0efe4601853af24b84119d00693f2d0568ac574a47d58fd45d8a356efb964b9c"
+    "lines": 10,
+    "sha256": "a801e2bd0c56f1638dca4a596ea6622070a8cb638da1440e779370bb0bdc53f4"
   },
   {
     "file": "scripts/verification/verify_browser.py",
-    "lines": 42,
-    "sha256": "93da8e0f20b0144f2803b589b99a10753c383a2b4127adcda5f8a31fbe73db64"
+    "lines": 47,
+    "sha256": "1e25e113539a268daaa15865d3345cae0bf549b9534f612a8e10834888286fc7"
   },
   {
     "file": "requirements-browser.txt",
@@ -226,8 +226,8 @@
   },
   {
     "file": "scripts/docs/export_guide_markdown.py",
-    "lines": 124,
-    "sha256": "d65fe0d61db89b8aa4cb5ef8aca758f13bc94c03baa9d8111f14fbda61f8ee82"
+    "lines": 130,
+    "sha256": "87963a6be97bdcd99007b302de3765dcaf7255c6e207d1a366cc94495147d902"
   },
   {
     "file": "docs/architecture.md",
@@ -246,7 +246,7 @@
   },
   {
     "file": "docs/README.md",
-    "lines": 21,
-    "sha256": "7699cca6bcca9de28825e9b9c5cdffb78c579942ac561e286e143f2571cfb071"
+    "lines": 34,
+    "sha256": "772bfea1daf90c576e363479703fb1c98c9236596bd2a63c9244afa62bc84db7"
   }
 ]

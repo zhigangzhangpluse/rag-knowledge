@@ -13,3 +13,4 @@ reports/*
 .mypy_cache/
 *.log
 .coverage
+.idea/
