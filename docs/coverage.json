@@ -115,9 +115,9 @@
   },
   {
     "file": "scripts/docs/build_guide.py",
-    "lines": 426,
-    "explained_lines": 426,
-    "sha256": "f10d61aeda40f9fa354ffbecb4d3076b4e9e1726ca196213acc94d667eb403fd"
+    "lines": 432,
+    "explained_lines": 432,
+    "sha256": "a0188b697f1dc90c7570729ece2556a68643a8fe76cc45c9bb643c607dfa5653"
   },
   {
     "file": "tests/__init__.py",
@@ -199,9 +199,9 @@
   },
   {
     "file": "README.md",
-    "lines": 120,
-    "explained_lines": 120,
-    "sha256": "08221971a878b2d9eb4e8367b2b9409644e44069daf1fe69d5d900f03e2ac24a"
+    "lines": 121,
+    "explained_lines": 121,
+    "sha256": "43eaf1d1dfe169392fdf6ecd97bc23804d7091efa3b325df35581aa2638ce8b0"
   },
   {
     "file": "docs/chapters.html",
@@ -211,9 +211,9 @@
   },
   {
     "file": "docs/file_notes.json",
-    "lines": 327,
-    "explained_lines": 327,
-    "sha256": "e5f02ddef6f1393bd0b362df4b115be6e2f0deebceb9e245756a7060f0e6c432"
+    "lines": 316,
+    "explained_lines": 316,
+    "sha256": "f083469417f28280f540544929530902492b47a4dc27138a6b4832d0f8f4d807"
   },
   {
     "file": "scripts/verification/verify_model_pipeline.py",
@@ -270,12 +270,6 @@
     "sha256": "a7bc75cbc21ab4e6b99e4dc78edcbd312e5f8097ed7136131d3272cb45377cc2"
   },
   {
-    "file": "scripts/docs/export_guide_markdown.py",
-    "lines": 130,
-    "explained_lines": 130,
-    "sha256": "87963a6be97bdcd99007b302de3765dcaf7255c6e207d1a366cc94495147d902"
-  },
-  {
     "file": "docs/architecture.md",
     "lines": 47,
     "explained_lines": 47,
@@ -295,8 +289,8 @@
   },
   {
     "file": "docs/README.md",
-    "lines": 34,
-    "explained_lines": 34,
-    "sha256": "772bfea1daf90c576e363479703fb1c98c9236596bd2a63c9244afa62bc84db7"
+    "lines": 33,
+    "explained_lines": 33,
+    "sha256": "cdacbb7d840c83881f39e1bcfc0abbad6f9d434f0528fa7db41b8bf10b6fb913"
   }
 ]

@@ -6,8 +6,8 @@
 | [deployment.md](deployment.md) | 环境、配置、启动、备份和排错 |
 | [evaluation.md](evaluation.md) | 自动测试、真实验收与人工评测 |
 | [verification.md](verification.md) | 已验证范围与实验结果 |
-| [项目学习手册.md](项目学习手册.md) | 系统教学、完整源码、逐行解析与扩展 |
-| [学习手册.html](学习手册.html) | 可离线使用的搜索和折叠式学习手册 |
+| [项目学习手册.md](项目学习手册.md) | 精简学习主线、代码入口和 28 道面试问答 |
+| [学习手册.html](学习手册.html) | 可离线搜索的完整源码、逐行说明与同源面试问答 |
 
 ## 更新学习手册
 
@@ -24,11 +24,10 @@
 
 面试问答需要结合代码理解；注释中明确指出的限制，不应介绍为已经实现的生产能力。
 
-修改源码后，在项目根目录执行：
+Markdown 版是人工维护的学习主线，改动功能时核对其中的流程、示例与面试答案。HTML 版由源码生成；修改源码后在项目根目录执行：
 
 ```powershell
 .venv/Scripts/python.exe scripts/docs/build_guide.py
-.venv/Scripts/python.exe scripts/docs/export_guide_markdown.py
 ```
 
-chapters.html 保存教学章节，file_notes.json 保存文件与函数的业务解释；coverage.json 和 markdown-coverage.json 用于核对手册对应的源码版本。新增源码文件时同步更新 file_notes.json。
+chapters.html 保存 HTML 版教学章节，面试问答从 Markdown 手册读取，file_notes.json 保存文件与函数的业务解释；coverage.json 用于核对 HTML 手册对应的源码版本。新增源码文件时同步更新 file_notes.json。

@@ -89,7 +89,7 @@ scripts/
   evaluation/           检索与回答评测
   verification/         外部服务、模型与浏览器验收
 deploy/                内嵌 etcd 配置及可选 Windows 安装工具
-docs/                  架构、部署、评测、验收和逐行学习手册
+docs/                  架构、部署、评测、验收、精简学习手册与逐行参考手册
 tests/                 自动业务测试
 eval/                  固定评测数据集
 samples/               示例文档
@@ -114,7 +114,8 @@ powershell -ExecutionPolicy Bypass -File scripts/check.ps1
 - [架构与模块职责](docs/architecture.md)
 - [部署与维护](docs/deployment.md)
 - [评测方法](docs/evaluation.md)
-- [完整逐行学习手册](docs/项目学习手册.md)
+- [精简学习手册与面试问答](docs/项目学习手册.md)
+- [完整源码逐行参考手册](docs/学习手册.html)
 - [文档索引](docs/README.md)
 
 密钥、上传资料、数据库和模型缓存保留在本地，不进入版本控制。

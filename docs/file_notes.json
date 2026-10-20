@@ -297,17 +297,6 @@
     "purpose": "浏览器验收可选依赖，日常运行问答项目不需要安装。",
     "knowledge": "固定 Playwright 版本，复用已安装的 Edge，不额外下载浏览器。pip install -r requirements-browser.txt 可安装。"
   },
-  "scripts/docs/export_guide_markdown.py": {
-    "purpose": "将系统教学章节、各文件职责、完整源码和逐行解析导出为 Markdown，便于离线阅读与记笔记。",
-    "knowledge": "HTMLParser 是 Python 标准库的 HTML 解析器；先构建节点树，再把标题、列表、表格转换成 Markdown。源码使用代码围栏完整保存，解释单独按行号列出，避免源码中的竖线破坏表格。Markdown 覆盖清单记录源文件哈希，用来发现过期文档。",
-    "functions": {
-      "main": "读取教学章节与文件说明，逐个导出当前源代码和解释，写入 Markdown 手册及覆盖清单。",
-      "render": "把 HTML 节点递归转换成 Markdown，保留标题、列表、代码和表格。",
-      "cell": "处理表格中的竖线和换行，防止单元格错位。",
-      "text": "递归收集节点中纯文本。",
-      "collect": "收集 HTML 表格行和单元格。"
-    }
-  },
   "docs/architecture.md": {
     "purpose": "说明系统模块、存储职责和业务一致性设计。",
     "knowledge": "文档中的路径相对项目根目录；命令执行前检查环境与所需参数。验证结果只支持明确记录的范围。"
